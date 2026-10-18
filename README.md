@@ -2,7 +2,7 @@
 
 A phone web app for the EasyBody 24-week plan.
 
-- **Today:** the session for the day, worked out from your start date. Tap a numbered circle after each set; the rest timer starts on its own. Weights carry over from last time.
+- **Today:** fits on one screen. The Up next card shows the next thing to do (or the routine due right now) with its set circles or Done button, so you can log it straight from home. Below it, one row per section (Warm-up, Workout, Cardio, Cool-down, Every day, Routines) shows minutes and progress; tap a row to open that section. Tap a numbered circle after each set; the rest timer starts on its own. Weights carry over from last time.
 - **How:** the play button on any exercise opens an animated form guide showing breathing, tempo and the muscles working.
 - **Warm-up and cool-down:** every training day starts with about 6 min of warm-up (easy bike, 4 moves, and ramp-up sets marked on the first lift for each muscle group) and ends with about 4 min of stretches and slow breathing. Tap Why? for the research. Warm-ups help performance and slightly reduce soreness; cool-downs are for comfort and do not prevent soreness.
 - **Routines:** short, research-backed habits that count toward the Daily ring: morning daylight, hourly 2-min desk breaks, 3-min bodyweight sets after meals with a caffeine cutoff, and an evening wind-down. No walking, no equipment. Each shows why it works. Settings sets the times and can download calendar reminders.
