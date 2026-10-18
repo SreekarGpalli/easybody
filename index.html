@@ -19,7 +19,7 @@
   --bg:#000; --card:#1C1C1E; --card2:#2C2C2E; --card3:#3A3A3C; --ink:#fff; --muted:#8E8E93; --muted2:#636366; --line:rgba(84,84,88,.6);
   --r1:#FA114F; --r2:#A6FF00; --r3:#00D8F5; --volt:#DCFF3B; --fire:#FF9F0A; --indigo:#5E5CE6; --purple:#BF5AF2;
   --accent:#FA114F; --accent-ink:#fff; --ok:#30D158; --warn:#FFD60A; --danger:#FF453A; --chip:#2C2C2E; --rc:var(--r1);
-  --st-bg1:#1C232D; --st-bg2:#0D1116; --st-fig:#F4F7FA; --st-torso:#BFCBD8; --st-fig2:#6B7786; --st-ol:#0A0E13; --st-eq:#2E4256; --st-eq2:#6F92B5;
+  --st-bg1:#1C232D; --st-bg2:#0D1116; --st-fig:#F4F7FA; --st-torso:#BFCBD8; --st-fig2:#6B7786; --st-hair:#3A4552; --st-ol:#0A0E13; --st-eq:#2E4256; --st-eq2:#6F92B5;
   --br-in:#5AB4FF; --br-out:#45E0A2; --br-hold:#F4D35E;
   --st-floor:#161C23; --st-line:#3A4552; --st-heat:#FF6A33; --st-str:#A48BFF; --st-text:#F4F7FA; --st-muted:#93A0AD;
   --fb:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
@@ -135,6 +135,8 @@ input,textarea{font:inherit;color:var(--ink)}
 .row .sub2{flex:1;font-size:16px}
 .why{margin:10px 0 2px;font-size:13px;color:var(--muted);line-height:1.4}
 .why b{color:var(--rc);font-weight:700;margin-right:6px}
+.hint .linkbtn{font-size:13px;padding:2px 0}
+.secwhy{margin:-2px 4px 10px}
 .tag{font-size:11px;font-weight:600;padding:2px 7px;border-radius:6px;background:var(--card2);color:var(--muted);margin-left:6px;vertical-align:2px}
 /* rest timer: watch-style */
 .rest{position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 68px);z-index:6;display:flex;justify-content:center;padding:0 10px;pointer-events:none}
@@ -291,12 +293,9 @@ textarea{width:100%;min-height:96px;background:var(--card2);border:0;border-radi
 .s-eq{fill:var(--st-eq)} .s-pad{fill:var(--st-eq2)} .s-steel{fill:var(--st-eq2)}
 .s-line{stroke:var(--st-eq2);fill:none}
 .s-wall{fill:#151B22;stroke:var(--st-eq);stroke-width:2}
-.b{stroke:var(--st-fig);stroke-linecap:round;stroke-linejoin:round;fill:none}
-.b.far{stroke:var(--st-fig2)} .b.tor{stroke:var(--st-torso)}
-.ol{stroke:var(--st-ol);stroke-linecap:round;stroke-linejoin:round;fill:none}
-.bf{fill:var(--st-fig);stroke:var(--st-ol);stroke-width:1.8} .bf.far{fill:var(--st-fig2)}
-.torso{fill:var(--st-torso);stroke:var(--st-torso);stroke-linejoin:round;stroke-linecap:round}
-.torso.ol{fill:var(--st-ol);stroke:var(--st-ol)}
+.lb{fill:var(--st-fig);stroke:var(--st-ol);stroke-width:1.7;stroke-linejoin:round} .lb.far{fill:var(--st-fig2)}
+.torso{fill:var(--st-torso);stroke:var(--st-ol);stroke-width:1.7;stroke-linejoin:round}
+.hair{fill:var(--st-hair);stroke:none}
 .trail{fill:none;stroke:#FFFFFF;stroke-opacity:.28;stroke-linecap:round}
 .s-mat{fill:#16212C;stroke:#2A3A4B;stroke-width:2}
 .eye{fill:var(--st-bg2)}
@@ -377,8 +376,9 @@ textarea{width:100%;min-height:96px;background:var(--card2);border:0;border-radi
 <script>
 "use strict";
 /* ---------- geometry ---------- */
-const D2R=Math.PI/180, FY=258, AY=254;
-const L={sh:46,th:50,to:58,nk:7,hr:11,ua:33,fa:30,ft:16};
+/* proportions follow Winter's anthropometric segment lengths (thigh ≈ shank ≈ .245 H, upper arm .186 H, forearm to grip ≈ .19 H); ankle sits 8 above the floor so the drawn sole touches it */
+const D2R=Math.PI/180, FY=258, AY=250;
+const L={sh:48,th:48,to:58,nk:9,hr:12,ua:36,fa:37,ft:22};
 const U=d=>[Math.sin(d*D2R),Math.cos(d*D2R)];
 const add=(p,v,s=1)=>[p[0]+v[0]*s,p[1]+v[1]*s];
 const sub=(a,b)=>[a[0]-b[0],a[1]-b[1]];
@@ -395,7 +395,7 @@ function ik(P,T,a,b,k){
 }
 function limb(o,k){return Object.assign({a:[0,0],k,s:[1,1],fp:90,fl:1},o||{})}
 function P(o){
-  const p=Object.assign({hip:[178,AY-95.5],tor:180,head:0,flip:-1,hw:0,sw:0,front:0,top:0,rot:0,ts:1,look:0},o);
+  const p=Object.assign({hip:[178,AY-95.6],tor:180,head:0,flip:-1,hw:0,sw:0,front:0,top:0,rot:0,ts:1,look:0},o);
   const lg=o.legs||[o.leg,o.leg],am=o.arms||[o.arm,o.arm];
   p.legs=[limb(lg[0],-1),limb(lg[1],-1)];p.arms=[limb(am[0],1),limb(am[1],1)];
   delete p.leg;delete p.arm;return p;
@@ -421,10 +421,25 @@ function compute(p){
   }
   return J;
 }
-/* pose helpers */
-const stand=(x,o={})=>P(Object.assign({hip:[x,AY-95.5],legs:[{t:[x-2,AY]},{t:[x+4,AY]}]},o));
-function plank(ax,ay,th,o={}){const d=90+th;return P(Object.assign({hip:add([ax,ay],U(d),95.4),tor:d,legs:[{t:[ax+1,ay],fp:20},{t:[ax,ay],fp:20}]},o))}
-function hang(sx,sy,tor,o={}){return P(Object.assign({hip:add([sx,sy],U(tor),-58),tor},o))}
+/* pose builders: side views face right, angles in degrees, forward = + */
+const sn=d=>Math.sin(d*D2R),cs=d=>Math.cos(d*D2R);
+const S_OF=p=>add(p.hip,U(p.tor),L.to*(p.ts??1));
+/* hip from a planted ankle: s = shin lean, q = thigh angle from vertical (90 = thigh parallel to the floor; negative = hip ahead of knee) */
+function legUp(ax,ay,s,q){const k=[ax+L.sh*sn(s),ay-L.sh*cs(s)];return add(k,[-sn(q),-cs(q)],L.th)}
+/* standing family: x = near ankle, tr = trunk lean; everything else passes through to P */
+function stance(o){const{x=178,s=0,q=0,tr=0,dx=-3,ay=AY,fp=90,...r}=o;
+  return P(Object.assign({hip:legUp(x,ay,s,q),tor:180-tr,legs:[{t:[x+dx,ay],fp},{t:[x,ay],fp}]},r))}
+function arms(p,a0,a1){p.arms=[limb(a0,1),limb(a1,1)];return p}
+/* foot on its toes / ball: ankle position that puts that point of the drawn foot at (x,y) */
+function toeAnkle(x,fp,y=FY){const f=U(fp),n=[-f[1],f[0]];return[x-f[0]*23.5-n[0]*7,y-f[1]*23.5-n[1]*7]}
+function ballAnkle(x,y,fp){const f=U(fp),n=[-f[1],f[0]];return[x-f[0]*17-n[0]*8,y-f[1]*17-n[1]*8]}
+/* plank on the toes, pivoting at toe point tx, body th degrees above the floor */
+function plankAt(tx,th,o={}){const fp=th+8,[ax,ay]=toeAnkle(tx,fp),hip=add([ax,ay],U(90+th),L.th+L.sh-.3);
+  return P(Object.assign({hip,tor:90+th,legs:[{t:[ax+1,ay],fp},{t:[ax,ay],fp}]},o))}
+/* bisection: value of v in [lo,hi] where f(v) crosses target (f monotonic) */
+function solve(f,lo,hi,target){const up=f(hi)>f(lo);for(let k=0;k<44;k++){const m=(lo+hi)/2;(f(m)<target)===up?lo=m:hi=m}return(lo+hi)/2}
+const plankS=(tx,sy,o)=>plankAt(tx,solve(th=>-S_OF(plankAt(tx,th,o))[1],-5,60,-sy),o);
+const hangS=(S,tor,o={})=>P(Object.assign({hip:add(S,U(tor),-L.to),tor},o));
 function A(s){const o={};if(!s)return o;s.split(",").forEach(x=>{const[k,v]=x.split(":");o[k.trim()]=+v});return o}
 function clone(p){return JSON.parse(JSON.stringify(p))}
 
@@ -481,6 +496,46 @@ const f1=n=>Math.round(n*10)/10;
 function setLine(e,a,b){e.setAttribute("x1",f1(a[0]));e.setAttribute("y1",f1(a[1]));e.setAttribute("x2",f1(b[0]));e.setAttribute("y2",f1(b[1]));if(e._o)setLine(e._o,a,b)}
 function setC(e,p){e.setAttribute("cx",f1(p[0]));e.setAttribute("cy",f1(p[1]))}
 
+/* ---------- body shapes ---------- */
+const q2=p=>f1(p[0])+" "+f1(p[1]);
+const unit=v=>{const l=len(v)||1;return[v[0]/l,v[1]/l]};
+/* which way the body faces in its own frame: +1 = anterior is clockwise of the torso axis (side views face right) */
+const limbSign=p=>p.pf??(p.flip<0?1:-1);
+/* radius at each end [a,b] and extra bulge [front,back] at the middle */
+const WSIDE={th:[8.6,6.2,1.1,1.7],sh:[6.2,4,.3,2],ua:[5.6,4.4,.9,.9],fa:[4.6,3.5,.6,.5],nk:[4.8,4.6,0,0]};
+const WFRONT={th:[8.4,5.6,.8,.8],sh:[5.6,3.8,.6,.6],ua:[5.4,4.2,.6,.6],fa:[4.4,3.4,.4,.4],nk:[5.2,5,0,0]};
+function segD(a,b,w,sg){
+  let v=sub(b,a),l=len(v);if(l<.01){v=[0,1];l=1}
+  const u=[v[0]/l,v[1]/l],n=[-u[1]*sg,u[0]*sg],ra=w[0],rb=w[1],m=[(a[0]+b[0])/2,(a[1]+b[1])/2],mw=(ra+rb)/2,sw=sg>0?0:1;
+  return`M${q2(add(a,n,ra))}Q${q2(add(m,n,mw+2*w[3]))} ${q2(add(b,n,rb))}A${rb} ${rb} 0 0 ${sw} ${q2(add(b,n,-rb))}Q${q2(add(m,n,-(mw+2*w[2])))} ${q2(add(a,n,-ra))}A${ra} ${ra} 0 0 ${sw} ${q2(add(a,n,ra))}Z`;
+}
+/* side-view foot: heel, sole, toes; ankle sits 8 above the sole */
+function footSidePts(A,fp,fl,sg){const f=U(fp),n=[-f[1]*sg,f[0]*sg];return(x,y)=>add(add(A,f,x*fl),n,y)}
+function footD(A,fp,fl,sg){const P=footSidePts(A,fp,fl,sg),Q=(x,y)=>q2(P(x,y));
+  return`M${Q(-4,-2.5)}L${Q(-6.5,4)}Q${Q(-7,8)} ${Q(-3,8)}L${Q(17,8)}Q${Q(24,8)} ${Q(23.5,5)}L${Q(21,2)}Q${Q(13,-.5)} ${Q(5,-3.5)}Z`}
+/* front-view foot: a short block below the ankle, toes turned out a little */
+function footFrontPts(A,K,toe){let d=unit(sub(A,K));if(d[1]>.6)d=[0,1];const t=[-d[1],d[0]],ox=Math.sign((toe[0]-A[0])*t[0]+(toe[1]-A[1])*t[1])*2.5;return(x,y)=>add(add(A,t,x+ox*Math.max(0,y)/8),d,y)}
+function footFD(A,K,toe){const P=footFrontPts(A,K,toe),Q=(x,y)=>q2(P(x,y));
+  return`M${Q(-4.2,-1.5)}L${Q(4.2,-1.5)}L${Q(5.6,5.5)}Q${Q(5.6,8)} ${Q(3,8)}L${Q(-3,8)}Q${Q(-5.6,8)} ${Q(-5.6,5.5)}Z`}
+/* sole points used by the floor check */
+function solePts(J,i,p,front){const g=p.legs[i];if(front||p.top)return front?[[-5,8],[5,8]].map(([x,y])=>footFrontPts(J.ankles[i],J.knees[i],J.toes[i])(x,y)):[J.toes[i]];
+  const P=footSidePts(J.ankles[i],g.fp,g.fl,limbSign(p));return[P(-3,8),P(-6,6.5),P(17,8),P(23,6.5)]}
+function smoothClosed(pts){const n=pts.length;let d=`M${q2(pts[0])}`;
+  for(let i=0;i<n;i++){const p0=pts[(i-1+n)%n],p1=pts[i],p2=pts[(i+1)%n],p3=pts[(i+2)%n];
+    d+=`C${q2(add(p1,sub(p2,p0),1/6))} ${q2(add(p2,sub(p3,p1),-1/6))} ${q2(p2)}`}
+  return d+"Z"}
+/* side torso profile: [height along spine from hip joint, front depth, back depth] */
+const TPROF=[[-.15,4,7],[0,8.5,11.5],[.25,9.5,9.5],[.5,9.5,8.2],[.76,11.5,10.5],[.95,9,9.5],[1.1,5,4]];
+function torsoSideD(J,p){const f=clamp(p.flip,-1,1),wA=(1-f)/2,wB=(1+f)/2,L2=L.to*(p.ts??1),pts=[];
+  for(let k=TPROF.length-1;k>=0;k--){const[t,a,b]=TPROF[k];pts.push(add(add(J.H,J.tv,t*L2),J.pr,b+(a-b)*wA))}
+  for(let k=0;k<TPROF.length;k++){const[t,a,b]=TPROF[k];pts.push(add(add(J.H,J.tv,t*L2),J.pr,-(b+(a-b)*wB)))}
+  return smoothClosed(pts)}
+function torsoFrontD(J){const up=unit(sub(J.S,J.H)),pr=[-up[1],up[0]],dv=(a,b)=>{const v=sub(b,a);return len(v)>1?unit(v):pr};
+  const dS=dv(J.shs[0],J.shs[1]),dH=dv(J.hips[0],J.hips[1]),ws=len(sub(J.shs[1],J.shs[0]))/2,wh=len(sub(J.hips[1],J.hips[0]))/2;
+  const at=t=>add(J.H,sub(J.S,J.H),t),W=at(.42),Ar=at(.74),N=add(J.S,up,6),S=J.S,H=J.H;
+  const side=k=>[add(add(S,dS,k*(ws+2)),up,3.5),add(add(S,dS,k*(ws+6.5)),up,-2.5),add(Ar,dS,k*(ws*.85+5)),add(W,dH,k*(wh+5.5)),add(add(H,dH,k*(wh+7)),up,-2),add(add(H,dH,k*3),up,-7)];
+  return smoothClosed([add(N,dS,-4.5),...side(-1),...side(1).reverse(),add(N,dS,4.5)])}
+
 /* ---------- static scenery ---------- */
 const SC={
   floor:()=>`<rect x="-600" y="${FY}" width="1600" height="200" class="s-floor"/><line x1="-600" x2="1000" y1="${FY}" y2="${FY}" class="s-floorline"/>`,
@@ -491,14 +546,15 @@ const SC={
   wallL:x=>`<rect x="${x-900}" y="-300" width="900" height="${FY+300}" class="s-wall"/>`,
   pole:x=>`<rect x="${x}" y="-200" width="6" height="${FY+200}" rx="2" class="s-eq"/>`,
   anchor:(x,y)=>`<rect x="${x-6}" y="${y-6}" width="12" height="12" rx="2" class="s-steel"/>`,
-  line:(x1,y1,x2,y2,w=9)=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke-width="${w}" stroke-linecap="round" class="s-line" style="stroke:var(--pad)"/>`,
+  line:(x1,y1,x2,y2,w=9)=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke-width="${w}" stroke-linecap="round" class="s-line"/>`,
   note:(x,y,t,anchor="start")=>`<text x="${x}" y="${y}" class="vnote" text-anchor="${anchor}">${t}</text>`
 };
 
 /* ---------- props (moving equipment) ---------- */
 const PROPS={
-  trapbar:{make(g){el("rect",{x:-46,y:-3,width:92,height:6,rx:3,class:"p-steel"},g);el("circle",{r:20,class:"p-plate"},g);el("circle",{r:4,class:"p-steel"},g);el("rect",{x:-3,y:-26,width:6,height:24,rx:2,class:"p-steel"},g)},
-    up(g,J){const h=J.hands[1];g.setAttribute("transform",`translate(${f1(h[0])} ${f1(h[1]+24)})`)}},
+  /* trap bar from the side: 45 cm plate (r 25), frame at the sleeve, raised handle in the hand (dy = handle height above the sleeve) */
+  trapbar:{make(g,o){el("rect",{x:-40,y:-3,width:80,height:6,rx:3,class:"p-steel"},g);el("circle",{r:25,class:"p-plate"},g);el("circle",{r:5,class:"p-steel"},g);el("rect",{x:-4,y:-o.dy-4,width:8,height:o.dy+6,rx:3,class:"p-steel"},g)},
+    up(g,J,p,o){const h=J.hands[1];g.setAttribute("transform",`translate(${f1(h[0])} ${f1(h[1]+o.dy)})`)}},
   dbs:{make(g){for(let i=0;i<2;i++){const s=el("g",{},g);el("circle",{r:7.5,class:"p-plate"},s);el("circle",{r:2.5,class:"p-steel"},s)}},
     up(g,J){[...g.children].forEach((s,i)=>s.setAttribute("transform",`translate(${f1(J.hands[i][0])} ${f1(J.hands[i][1])})`))}},
   db1:{make(g){el("circle",{r:7.5,class:"p-plate"},g);el("circle",{r:2.5,class:"p-steel"},g)},up(g,J){const h=J.hands[1];g.setAttribute("transform",`translate(${f1(h[0])} ${f1(h[1])})`)}},
@@ -514,7 +570,7 @@ const PROPS={
     up(g,J){const k=J.knees[1],a=J.ankles[1],v=sub(a,k),l=len(v),u=[v[0]/l,v[1]/l],bk=[-u[1],u[0]];const q=add(add(a,u,-7),bk,10);g.setAttribute("transform",`translate(${f1(q[0])} ${f1(q[1])})`)}},
   headplate:{make(g){el("rect",{x:-10,y:-2.5,width:20,height:5,rx:2,class:"p-steel"},g)},
     up(g,J){const q=add(J.HC,U(J.face),13.5);g.setAttribute("transform",`translate(${f1(q[0])} ${f1(q[1])}) rotate(${f1(-J.face)})`)}},
-  trapbarF:{make(g){el("rect",{x:-60,y:-3,width:120,height:6,rx:3,class:"p-steel"},g);[-1,1].forEach(k=>{el("rect",{x:k*62-4.5,y:4,width:9,height:40,rx:2,class:"p-plate"},g);el("rect",{x:k*58-1.5,y:-2,width:3,height:26,class:"p-steel"},g)})},
+  trapbarF:{make(g,o){const d=o.dy||11;el("rect",{x:-64,y:d-3,width:128,height:6,rx:3,class:"p-steel"},g);[-1,1].forEach(k=>{el("rect",{x:k*64-5,y:d-25,width:10,height:50,rx:2,class:"p-plate"},g);el("rect",{x:k*24-3,y:-4,width:6,height:d+4,rx:2,class:"p-steel"},g)})},
     up(g,J){const y=(J.hands[0][1]+J.hands[1][1])/2;g.setAttribute("transform",`translate(180 ${f1(y)})`)}},
   dbF1:{make(g){const s=el("g",{},g);el("rect",{x:-11,y:-2,width:22,height:4,class:"p-steel"},s);el("rect",{x:-14,y:-8,width:5,height:16,rx:1.5,class:"p-steel"},s);el("rect",{x:9,y:-8,width:5,height:16,rx:1.5,class:"p-steel"},s)},
     up(g,J){g.setAttribute("transform",`translate(${f1(J.hands[1][0])} ${f1(J.hands[1][1])})`)}},
@@ -523,6 +579,7 @@ const PROPS={
   landmine:{make(g){g._b=el("line",{"stroke-linecap":"round",style:"stroke:var(--st-eq2);stroke-width:6"},g);g._p=el("rect",{x:-4.5,y:-15,width:9,height:30,rx:2,class:"p-plate"},g)},
     up(g,J,p,o){const m=[(J.hands[0][0]+J.hands[1][0])/2,(J.hands[0][1]+J.hands[1][1])/2],a=[o.ax,o.ay],v=sub(m,a),l=len(v)||1,e=add(m,[v[0]/l,v[1]/l],-14);
       setLine(g._b,a,add(m,[v[0]/l,v[1]/l],10));const ang=Math.atan2(v[1],v[0])/D2R;g._p.setAttribute("transform",`translate(${f1(e[0])} ${f1(e[1])}) rotate(${f1(ang)})`)}},
+  bandH:{make(g){g._l=el("line",{class:"p-band"},g)},up(g,J){setLine(g._l,J.hands[0],J.hands[1])}},
   harness:{make(g){g._l=el("line",{class:"p-cable"},g);g._p=el("rect",{x:-11,y:-3,width:22,height:6,rx:2,class:"p-steel"},g)},
     up(g,J){const a=J.HC,b=[a[0],a[1]+42];setLine(g._l,a,b);g._p.setAttribute("transform",`translate(${f1(b[0])} ${f1(b[1])})`)}}
 };
@@ -635,31 +692,30 @@ class Stage{
       if(!this.thumb){this.mkCalls(this.ov,this.R.calls.map(k=>k.key));this.mkRips(this.ov)}
       return;
     }
-    const p0=c.poses[c.start],front=!!p0.front||this.proj,side=!front;
+    const p0=c.poses[c.start],front=!!p0.front||this.proj,side=!front;this.front=front;
     this.trailG=el("g",{},root);const back=el("g",{},root);this.props=[];
-    const mk=(cls,w)=>{const e=el("line",{class:"b "+cls,"stroke-width":w},null);e._o=el("line",{class:"ol","stroke-width":w+3.6},null);return e};
+    const mk=cls=>el("path",{class:"lb "+cls});
     const B=this.B={};
-    const limbEls=(i,far)=>{const cl=far?"far":"";return{th:mk(cl,15),sh:mk(cl,11),ft:mk(cl,7),ua:mk(cl,10),fa:mk(cl,8),hd:el("circle",{r:4.6,class:"bf "+cl})}};
+    const limbEls=(i,far)=>{const cl=far?"far":"";return{th:mk(cl),sh:mk(cl),ft:mk(cl),ua:mk(cl),fa:mk(cl),hd:el("ellipse",{rx:5.8,ry:4.2,class:"lb "+cl})}};
     B.L=[limbEls(0,side),limbEls(1,false)];const ab=!!p0.armsBack;
-    if(ab)B.L.forEach(l=>[l.ua,l.fa,l.hd].forEach(e=>{e.classList.add("far");if(e._o)e._o.classList.add("ol")}));
-    B.torso=el("path",{class:"torso","stroke-width":side?22:12});B.torso._o=el("path",{class:"torso ol","stroke-width":side?25.6:15.6});
-    B.chest=el("line",{class:"b tor","stroke-width":side?27:0});
-    B.neck=el("line",{class:"b tor","stroke-width":9});B.neck._o=el("line",{class:"ol","stroke-width":12.6});
-    B.head=el("circle",{r:L.hr,class:"bf"});
+    if(ab)B.L.forEach(l=>[l.ua,l.fa,l.hd].forEach(e=>e.classList.add("far")));
+    B.torso=el("path",{class:"torso"});B.neck=mk("");
+    B.head=el("circle",{r:L.hr,class:"lb"});B.nose=el("path",{class:"lb"});B.hair=el("path",{class:"hair"});
     B.e1=el("circle",{r:2.1,class:"eye"});B.e2=el("circle",{r:front?2.1:0,class:"eye"});if(this.view==="back"){B.e1.setAttribute("r",0);B.e2.setAttribute("r",0)}
     const PR=(c.props||ex.props||[]).map(o=>this.proj?(PMAP[o.type]?Object.assign({},o,{type:PMAP[o.type]}):null):o).filter(Boolean);this.PR=PR;
     PR.forEach(o=>{if(o.z==="back"){const g=el("g",{},back);PROPS[o.type].make(g,o);this.props.push({g,o})}});
-    const body=el("g",{},root);const ap=e=>{if(e._o)body.appendChild(e._o);body.appendChild(e)};
-    const L0=B.L[0],L1=B.L[1],legs=!p0.hideLegs;this.body=body;this.parts=null;
+    const body=el("g",{},root);const ap=e=>body.appendChild(e);
+    const L0=B.L[0],L1=B.L[1],legs=!p0.hideLegs,HEAD=[B.neck,B.torso,B.head,B.hair,B.nose,B.e1,B.e2];this.body=body;this.parts=null;
     if(this.proj){const pg={};["L0","A0","T","L1","A1"].forEach(k=>pg[k]=el("g",{},body));this.parts=pg;this.pord="";
-      const apg=(g,e)=>{if(e._o)g.appendChild(e._o);g.appendChild(e)};
-      if(!ex.projHideLegs){[L0.th,L0.sh,L0.ft].forEach(e=>apg(pg.L0,e));[L1.th,L1.sh,L1.ft].forEach(e=>apg(pg.L1,e))}
-      [L0.ua,L0.fa,L0.hd].forEach(e=>apg(pg.A0,e));[L1.ua,L1.fa,L1.hd].forEach(e=>apg(pg.A1,e));
-      [B.neck,B.torso,B.chest,B.head,B.e1,B.e2].forEach(e=>apg(pg.T,e));
+      if(!ex.projHideLegs){[L0.th,L0.sh,L0.ft].forEach(e=>pg.L0.appendChild(e));[L1.th,L1.sh,L1.ft].forEach(e=>pg.L1.appendChild(e))}
+      [L0.ua,L0.fa,L0.hd].forEach(e=>pg.A0.appendChild(e));[L1.ua,L1.fa,L1.hd].forEach(e=>pg.A1.appendChild(e));
+      HEAD.forEach(e=>pg.T.appendChild(e));
     }else{
     if(ab)[L0.ua,L0.fa,L0.hd,L1.ua,L1.fa,L1.hd].forEach(ap);
+    /* side views: far leg and arm behind the body; front views: both legs over the hips so the pelvis reads as one piece */
+    if(!side)HEAD.forEach(ap);
     if(legs)[L0.th,L0.sh,L0.ft].forEach(ap);if(side&&!ab)[L0.ua,L0.fa,L0.hd].forEach(ap);
-    [B.neck,B.torso,B.chest,B.head,B.e1,B.e2].forEach(ap);
+    if(side)HEAD.forEach(ap);
     if(legs)[L1.th,L1.sh,L1.ft].forEach(ap);if(!ab){if(!side)[L0.ua,L0.fa,L0.hd].forEach(ap);[L1.ua,L1.fa,L1.hd].forEach(ap)}}
     this.zones=[];
     const ztoks=c.zones||ex.zones||[];
@@ -680,7 +736,7 @@ class Stage{
     const props=this.PR||[];const bb=[1e9,1e9,-1e9,-1e9];const PB=p=>{bb[0]=Math.min(bb[0],p[0]);bb[1]=Math.min(bb[1],p[1]);bb[2]=Math.max(bb[2],p[0]);bb[3]=Math.max(bb[3],p[1])};this.bodyBB=bb;
     for(let k=0;k<=24;k++){const st=this.state(this.total*k/24),J=this.JJ(st.pose);
       [...J.hips,...(this.proj&&ex.projHideLegs?[]:[...J.knees,...J.ankles,...J.toes]),...J.shs,...J.elbows,...J.hands].forEach(q=>{P_(q);PB(q)});[add(J.HC,[-12,-12]),add(J.HC,[12,12])].forEach(q=>{P_(q);PB(q)});
-      props.forEach(o=>{if(o.type==="trapbarF"){const y=J.hands[1][1];P_([110,y+46]);P_([250,y+46])}else if(o.type==="kbF")P_(add(J.hands[1],[0,26]));else if(o.type==="trapbar"){P_(add(J.hands[1],[-46,44]));P_(add(J.hands[1],[46,44]))}else if(o.type==="kb")P_(add(J.hands[1],[0,26]));
+      props.forEach(o=>{if(o.type==="trapbarF"){const y=J.hands[1][1]+(o.dy||11);P_([110,y+25]);P_([250,y+25])}else if(o.type==="kbF")P_(add(J.hands[1],[0,26]));else if(o.type==="trapbar"){P_(add(J.hands[1],[-40,o.dy+25]));P_(add(J.hands[1],[40,o.dy+25]))}else if(o.type==="kb")P_(add(J.hands[1],[0,26]));
         else if(o.type==="ball"&&st.pose.bp)P_(st.pose.bp);else if(o.type==="cable")P_([o.ax,o.ay]);else if(o.type==="harness")P_([J.HC[0],J.HC[1]+48])})}
     if(!this.proj)(c.inc||ex.inc||[]).forEach(P_);
     if(!ex.noFloor)y2=Math.max(y2,FY+3);
@@ -722,17 +778,23 @@ class Stage{
       if(this.parts){const R=J.raw,g=this.view==="back"?-1:1,dp={L0:(R.hips[0][0]+R.knees[0][0]+R.ankles[0][0])/3,L1:(R.hips[1][0]+R.knees[1][0]+R.ankles[1][0])/3,
         A0:(R.shs[0][0]+R.elbows[0][0]+R.hands[0][0])/3,A1:(R.shs[1][0]+R.elbows[1][0]+R.hands[1][0])/3,T:(R.H[0]+R.S[0])/2};
         const ord=Object.keys(dp).sort((a,b)=>g*(dp[a]-dp[b]));const key=ord.join();if(key!==this.pord){this.pord=key;ord.forEach(k=>this.body.appendChild(this.parts[k]))}}
-      for(let i=0;i<2;i++){const l=B.L[i];setLine(l.th,J.hips[i],J.knees[i]);setLine(l.sh,J.knees[i],J.ankles[i]);setLine(l.ft,J.ankles[i],J.toes[i]);
-        setLine(l.ua,J.shs[i],J.elbows[i]);setLine(l.fa,J.elbows[i],J.hands[i]);setC(l.hd,J.hands[i])}
-      const q=[J.hips[0],J.shs[0],J.shs[1],J.hips[1]].map(v=>f1(v[0])+" "+f1(v[1]));
-      B.torso.setAttribute("d",`M${q[0]}L${q[1]}L${q[2]}L${q[3]}Z`);B.torso._o.setAttribute("d",B.torso.getAttribute("d"));
-      if(side)setLine(B.chest,add(J.H,J.tv,L.to*p.ts*.5),add(J.H,J.tv,L.to*p.ts*.86));
-      setLine(B.neck,J.S,J.N);setC(B.head,J.HC);
-      const fv=U(J.face),hv=U(J.hd);
+      const sg=side?limbSign(p):1,W=side?WSIDE:WFRONT,top=!!p.top;
+      for(let i=0;i<2;i++){const l=B.L[i],g=p.legs[i];
+        l.th.setAttribute("d",segD(J.hips[i],J.knees[i],W.th,sg));l.sh.setAttribute("d",segD(J.knees[i],J.ankles[i],W.sh,sg));
+        l.ft.setAttribute("d",top?segD(J.ankles[i],J.toes[i],[3.4,2.8,0,0],1):side?footD(J.ankles[i],g.fp,g.fl,sg):g.fl<.2?"":footFD(J.ankles[i],J.knees[i],J.toes[i]));
+        l.ua.setAttribute("d",segD(J.shs[i],J.elbows[i],W.ua,sg));l.fa.setAttribute("d",segD(J.elbows[i],J.hands[i],W.fa,sg));
+        const uf=unit(sub(J.hands[i],J.elbows[i])),hc=add(J.hands[i],uf,1.5);setC(l.hd,hc);l.hd.setAttribute("transform",`rotate(${f1(Math.atan2(uf[1],uf[0])/D2R)} ${q2(hc)})`)}
+      B.torso.setAttribute("d",side?torsoSideD(J,p):torsoFrontD(J));
+      B.neck.setAttribute("d",segD(J.S,add(J.N,sub(J.HC,J.N),.35),W.nk,sg));setC(B.head,J.HC);
+      const fv=U(J.face),hv=U(J.hd),R=L.hr+.4,H=J.HC,hp=(a,b)=>q2(add(add(H,fv,R*a),hv,R*b));
+      if(this.view==="back"||top)B.hair.setAttribute("d",`M${q2(add(H,[0,-R]))}A${R} ${R} 0 1 0 ${q2(add(H,[0,R]))}A${R} ${R} 0 1 0 ${q2(add(H,[0,-R]))}Z`);
+      else if(side){const sw=(fv[0]*hv[1]-fv[1]*hv[0])>0?1:0;B.hair.setAttribute("d",`M${hp(.45,.89)}A${R} ${R} 0 0 ${sw} ${hp(-.96,-.28)}Q${hp(-.2,.15)} ${hp(.45,.89)}Z`)}
+      else{const pr=U(J.hd-90),fp_=(a,b)=>q2(add(add(H,pr,R*a),hv,R*b));B.hair.setAttribute("d",`M${fp_(-.97,.25)}A${R} ${R} 0 0 1 ${fp_(.97,.25)}Q${fp_(0,.45)} ${fp_(-.97,.25)}Z`)}
+      B.nose.setAttribute("d",side&&!top&&this.view!=="back"?`M${hp(.9,.2)}L${hp(1.22,-.12)}L${hp(.92,-.32)}Z`:"");
       if(this.view==="back")mouth=add(J.HC,[0,6]);
-      else if(p.top){setC(B.e1,add(J.HC,U(0),6));B.e2.setAttribute("r",0);mouth=null}
-      else if(side){setC(B.e1,add(add(J.HC,fv,6),hv,2.5));mouth=add(add(J.HC,fv,12),hv,-3)}
-      else{const pr=U(J.hd-90),lk=this.proj?0:p.look*3;setC(B.e1,add(add(J.HC,pr,-4+lk),hv,1.5));setC(B.e2,add(add(J.HC,pr,4+lk),hv,1.5));mouth=add(J.HC,hv,-15)}
+      else if(top){setC(B.e1,add(J.HC,U(0),6));B.e2.setAttribute("r",0);mouth=null}
+      else if(side){setC(B.e1,add(add(J.HC,fv,6.5),hv,1.5));mouth=add(add(J.HC,fv,13),hv,-4)}
+      else{const pr=U(J.hd-90),lk=this.proj?0:p.look*3;setC(B.e1,add(add(J.HC,pr,-4.2+lk),hv,0));setC(B.e2,add(add(J.HC,pr,4.2+lk),hv,0));mouth=add(J.HC,hv,-16)}
       if(!this.thumb){
         cent=this.T(add(J.H,sub(J.S,J.H),.5));
         for(const z of this.zones){
@@ -790,41 +852,44 @@ class Stage{
 const EASE={io:u=>u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2,in:u=>u*u,out:u=>1-(1-u)*(1-u),lin:u=>u};
 
 /* ---------- exercise library ---------- */
-const GROUPS=[["main","Main lifts"],["legs","Legs & hips"],["upper","Back & shoulders"],["core","Core & rotation"],["neck","Neck & face"],["mob","Mobility"]];
+const GROUPS=[["main","Main lifts"],["legs","Legs & hips"],["upper","Back & shoulders"],["core","Core & rotation"],["neck","Neck & face"],["mob","Mobility"],["prep","Warm-up & cool-down"]];
 const EX=[];const X=o=>EX.push(o);
 const ph=(to,d,lab,br,cue,act,e)=>({to,d,lab,br,cue,act:typeof act==="string"?A(act):act||{},e});
 
-/* Trap-bar deadlift */
-{const top=stand(178,{arms:[{a:[0,0]},{a:[0,0]}]});
- const bot=P({hip:[150,192],tor:135,head:12,legs:[{t:[176,AY]},{t:[182,AY]}],arms:[{a:[0,0]},{a:[0,0]}]});
- X({id:"deadlift",views:["side","front"],lat:{hip:10,sh:19,knee:13,ankle:12,toe:16,elbow:23,hand:24},name:"Trap-bar deadlift",group:"main",when:"Mon · Wed · Fri",zones:["quads","glutes","hams","erect","upback","forearm"],props:[{type:"trapbar",z:"back"}],
-  clips:[{name:"Standard",poses:{top,bot},start:"bot",ph:[
+/* Trap-bar deadlift, high handles. Start: shins ~22°, hips just above knees, trunk ~41°, arms vertical.
+   Knees and hips extend together until the bar passes the knees, then the hips finish. Trunk angles keep the shoulders,
+   and so the bar, ~10 px ahead of the ankle (over mid-foot) in every keyframe, so the bar path is vertical. */
+{const x=168,mk=(s,q,tr,head=4)=>stance({x,s,q,tr,head,arms:[{a:[1,1]},{a:[0,0]}]});
+ const bot=mk(22,74,41),mid=mk(8,36,33),top=mk(3.7,-3.7,3.7,0),back=mk(4,22,25);
+ X({id:"deadlift",views:["side","front"],lat:{hip:10,sh:19,knee:13,ankle:12,toe:16,elbow:23,hand:24},name:"Trap-bar deadlift",group:"main",when:"Mon · Wed · Fri",zones:["quads","glutes","hams","erect","upback","forearm"],props:[{type:"trapbar",z:"back",dy:11}],
+  clips:[{name:"Standard",poses:{bot,mid,top,back},start:"bot",ph:[
    ph("bot",.8,"Brace","brace","Breathe in, brace, take the slack","erect:.6,upback:.5,forearm:.7,hams:.4"),
-   ph("top",.9,"Drive","out","Push the floor away","quads:1,glutes:1,hams:.8,erect:.8,upback:.7,forearm:.9","out"),
+   ph("mid",.5,"Drive","out","Push the floor away; chest and hips rise together","quads:1,glutes:.8,hams:.7,erect:.8,upback:.7,forearm:.9","in"),
+   ph("top",.5,"Drive","out","Hips through to stand tall","glutes:1,hams:.9,quads:.6,erect:.7,upback:.7,forearm:.9","out"),
    ph("top",.6,"Lockout","in","Squeeze glutes, don't lean back","glutes:.85,forearm:.7,upback:.6"),
-   ph("bot",1.8,"Lower","brace","Hips back, then knees","hams:.8,glutes:.7,quads:.6,erect:.7,forearm:.8"),
+   ph("back",.9,"Lower","brace","Hips back first","hams:.9,glutes:.7,erect:.7,forearm:.8","in"),
+   ph("bot",.9,"Lower","brace","Then bend the knees","quads:.7,glutes:.7,hams:.6,erect:.7,forearm:.8","out"),
    ph("bot",.7,"Reset","in","Settle the bar, re-breathe","forearm:.4")]}],
   dose:[["Wk 1–4","2–3 × 6–8 · RIR 3–4 · 2 min"],["Day A","3–4 × 4–6 · RIR 2–3 · 2–3 min"],["Day C","2–3 × 8–10 · RIR 2 · 2 min"]],
-  focus:["Flat back, chest up","Hips and shoulders rise together","No bounce at the bottom"],stop:"Back rounds or bar drifts forward"});}
+  focus:["Flat back, chest up","Hips and shoulders rise together","Bar travels straight up over mid-foot"],stop:"Back rounds or bar drifts forward"});}
 
-/* Kettlebell swing */
-{const legs=[{t:[176,AY]},{t:[182,AY]}];
- const hike=P({hip:[150,180],tor:125,head:25,legs,arms:[{a:[-25,-25]},{a:[-25,-25]}]});
- const drop=P({hip:[176,159],tor:178,legs,arms:[{a:[15,15]},{a:[15,15]}]});
- const flt=P({hip:[178,158.5],tor:180,legs,arms:[{a:[85,85]},{a:[85,85]}]});
+/* Kettlebell swing: hinge, not squat. Hips snap first; the bell floats to chest height from that drive; arms only guide. */
+{const x=176,sw=(s,q,tr,a,head=0)=>stance({x,s,q,tr,head,arms:[{a:[a+3,a+3]},{a:[a,a]}]});
+ const hike=sw(8,55,62,-40,18),snap=sw(0,0,-2,35),flt=sw(0,0,-2,88),drop=sw(0,0,0,22),conn=sw(4,18,20,-4,6);
  X({id:"swing",views:["side","front"],lat:{hip:10,sh:19,knee:14,ankle:15,toe:19,elbow:11,hand:4},name:"Kettlebell swing",group:"main",when:"Day A · Day B",zones:["glutes","hams","erect","abs","forearm"],props:[{type:"kb"}],
-  clips:[{name:"Swing",poses:{hike,drop,flt},start:"hike",ph:[
-   ph("flt",.45,"Snap","sharp","Snap hips, squeeze glutes","glutes:1,hams:1,abs:.7,erect:.6,forearm:.7","out"),
-   ph("flt",.25,"Float","hold","Stand like a plank","abs:.75,glutes:.6"),
-   ph("drop",.4,"Drop","in","Stay tall until arms hit hips","abs:.5,forearm:.6","in"),
-   ph("hike",.45,"Hike","in","Hips back, bell high","hams:.9,glutes:.7,erect:.7,forearm:.6","out")]}],
+  clips:[{name:"Swing",poses:{hike,snap,flt,drop,conn},start:"hike",ph:[
+   ph("snap",.28,"Snap","sharp","Snap hips, squeeze glutes","glutes:1,hams:1,abs:.7,erect:.6,forearm:.7","out"),
+   ph("flt",.25,"Float","hold","Stand like a plank; the bell floats","abs:.75,glutes:.6","out"),
+   ph("drop",.32,"Drop","in","Stay tall until your arms touch your hips","abs:.5,forearm:.6","in"),
+   ph("conn",.14,"Hinge","in","Then hinge, hips back","hams:.7,glutes:.5,forearm:.6","lin"),
+   ph("hike",.3,"Hike","in","Bell high between the legs","hams:.9,glutes:.7,erect:.7,forearm:.6","out")]}],
   dose:[["Wk 1","KB deadlift 3 × 8"],["Wk 2","Hike pass 3 × 5"],["Wk 3–4","5–8 rounds · 20–30 s on / 30–40 s off"],["Day A","10–12 rounds · 30 s on / 30 s off"],["Day B","Heavier · 6–8 × 5 · 45–60 s"]],
   focus:["Hinge, don't squat","Hips drive, arms guide","Bell floats to chest height"],stop:"Bell height drops or back rounds"});}
 
-/* Push-up */
-{const arms=[{t:[244,AY]},{t:[248,AY]}];
- const top=plank(100,239.5,18,{arms}),bot=plank(100,239.5,.5,{arms});
- const pbot=plank(100,239.5,4,{arms}),air=plank(100,239.5,25,{arms:[{t:[250,234]},{t:[254,234]}]});
+/* Push-up: rigid plank on the toes. Hands under the shoulders at the top, under the lower chest at the bottom; chest a fist off the floor. */
+{const tx=96,HY=FY-4.5,top0=plankS(tx,HY-72.8),hx=S_OF(top0)[0]+1,hd=[{t:[hx-1,HY]},{t:[hx+2,HY]}];
+ const top=arms(top0,...hd),bot=arms(plankS(tx,FY-22),...hd),pbot=arms(plankS(tx,FY-26),...hd);
+ const air0=plankS(tx,HY-72.4-14),ahx=S_OF(air0)[0],air=arms(air0,{t:[ahx,HY-14]},{t:[ahx+2,HY-14]});
  {const lt={hip:10,sh:19,knee:9,ankle:8,toe:8,elbow:27,hand:28},lb=Object.assign({},lt,{elbow:40});top.lat=lt;air.lat=lt;bot.lat=lb;pbot.lat=lb;}
  X({id:"pushup",views:["side","front"],projHideLegs:1,track:"S",name:"Push-up",group:"main",when:"Mon · Wed · Fri",zones:["chest","triceps","delt","abs","serr"],
   clips:[{name:"Standard",poses:{top,bot},start:"top",ph:[
@@ -840,12 +905,12 @@ const ph=(to,d,lab,br,cue,act,e)=>({to,d,lab,br,cue,act:typeof act==="string"?A(
   dose:[["Wk 1–4","2–3 × 8–12 · RIR 3"],["Day A","3–4 × 6–10 · RIR 2–3"],["Day C","3–4 × 10–20 · RIR 1–2"],["Day B","Fast 3 × 3–5"]],
   focus:["One straight line, glutes tight","Elbows 45° from body","Plyo only if pain-free"],stop:"Hips sag or range shortens"});}
 
-/* Chin-up / pull-up */
-{const arms=[{t:[204,30]},{t:[206,30]}];
- const hb=hang(203,92,186,{arms,legs:[{a:[6,-14],fp:40},{a:[10,-12],fp:40}]});
- const tp=hang(183,37,195,{arms,head:-14,legs:[{a:[14,-10],fp:40},{a:[18,-8],fp:40}]});
+/* Chin-up: dead hang with straight arms, then elbows drive down to the ribs until the chin clears the bar, body leaning back slightly. */
+{const bx=206,by=0,hand=[{t:[bx-1,by+1]},{t:[bx+1,by+1]}],lg=(a,b)=>[{a:[a+4,b+4],fp:25},{a:[a,b],fp:25}];
+ const hb=arms(hangS([bx-4,by+72.6],183,{legs:lg(12,-40)}),...hand);
+ const tp=arms(hangS([bx-14,by+12],196,{head:-10,legs:lg(22,-25)}),...hand);
  hb.lat={hip:10,sh:19,knee:8,ankle:7,toe:7,elbow:31,hand:28};tp.lat=Object.assign({},hb.lat,{elbow:38});
- X({id:"pullup",views:["side","back"],vscene:{back:`<rect x="104" y="-300" width="7" height="558" class="s-eq"/><rect x="249" y="-300" width="7" height="558" class="s-eq"/><rect x="104" y="27" width="152" height="6" rx="3" class="s-steel"/>`},track:"S",name:"Chin-up / pull-up",group:"main",inc:[[206,24],[246,30]],when:"Mon · Wed · Fri",zones:["lats","biceps","upback","forearm","rdelt"],scene:SC.bar(206,30),
+ X({id:"pullup",views:["side","back"],vscene:{back:`<rect x="104" y="-300" width="7" height="558" class="s-eq"/><rect x="249" y="-300" width="7" height="558" class="s-eq"/><rect x="104" y="${by-3}" width="152" height="6" rx="3" class="s-steel"/>`},track:"S",name:"Chin-up / pull-up",group:"main",inc:[[206,by-8],[246,by]],when:"Mon · Wed · Fri",zones:["lats","biceps","upback","forearm","rdelt"],scene:SC.bar(bx,by),
   clips:[{name:"Chin-up",poses:{hb,tp},start:"hb",ph:[
    ph("tp",1,"Pull","out","Elbows down to ribs","lats:1,biceps:1,upback:.8,forearm:.8,rdelt:.6","out"),
    ph("tp",.4,"Top","hold","Chin over, shoulders down","lats:.9,biceps:.9,upback:.9"),
@@ -859,12 +924,11 @@ const ph=(to,d,lab,br,cue,act,e)=>({to,d,lab,br,cue,act:typeof act==="string"?A(
   dose:[["Wk 1–4","Pulldown or assisted 2–3 × 8–10 · RIR 3"],["Day A","3–4 × 5–8 · RIR 2–3"],["Day C","3–4 × 8–12 · RIR 1–2"],["Day B","Fast 3 × 3–5"]],
   focus:["Start from a dead hang","Elbows down to ribs","No kipping"],stop:"Swinging or half reps"});}
 
-/* DB press → push press */
-{const sl=[{t:[176,AY]},{t:[182,AY]}];
- const rack=stand(176,{legs:sl,arms:[{t:[183,96]},{t:[186,96]}]}),up=stand(176,{legs:sl,arms:[{t:[176,40]},{t:[178,39]}]});
- const dip=P({hip:[176,172],legs:sl,arms:[{t:[183,110]},{t:[186,110]}]});
- const hkl=[{a:[3,-88],fp:-80,fl:.7},{t:[224,AY]}];
- const hk=P({hip:[176,200],legs:hkl,arms:[{a:[30,-40]},{t:[183,138]}]}),hku=P({hip:[176,200],legs:hkl,arms:[{a:[30,-40]},{t:[178,81]}]});
+/* Dumbbell press: rack at the shoulders with forearms vertical, press to straight arms over the shoulder. Half-kneeling: down knee on the pressing side. Push press: short knee dip with an upright torso. */
+{const x=178,rk=p=>{const S=S_OF(p);return arms(p,{t:[S[0]+8,S[1]-1]},{t:[S[0]+10,S[1]-2]})},oh=p=>{const S=S_OF(p);return arms(p,{t:[S[0]+1,S[1]-72.4]},{t:[S[0]+2,S[1]-72.4]})};
+ const rack=rk(stance({x})),up=oh(stance({x})),dip=rk(stance({x,s:32,q:32}));
+ const hkb=()=>P({hip:[170,202],legs:[{t:[218,AY],fp:90},{a:[-1,-90],fp:-90}]});
+ const hk=(()=>{const p=hkb(),S=S_OF(p);return arms(p,{a:[4,4]},{t:[S[0]+10,S[1]-2]})})(),hku=(()=>{const p=hkb(),S=S_OF(p);return arms(p,{a:[4,4]},{t:[S[0]+2,S[1]-72.4]})})();
  rack.lat={hip:10,sh:19,knee:11,ankle:11,toe:14,elbow:28,hand:25};dip.lat=rack.lat;up.lat=Object.assign({},rack.lat,{elbow:23,hand:20});
  hk.lat={hip:10,sh:19,knee:[10,13],ankle:[10,13],toe:[10,15],elbow:[27,27],hand:[15,24]};hku.lat=Object.assign({},hk.lat,{elbow:[27,22],hand:[15,20]});
  X({id:"press",views:["side","front"],name:"Dumbbell press",group:"main",when:"Mon · Wed · Fri",zones:["delt","triceps","upback","abs"],props:[{type:"dbs"}],
@@ -873,9 +937,9 @@ const ph=(to,d,lab,br,cue,act,e)=>({to,d,lab,br,cue,act:typeof act==="string"?A(
    ph("up",.8,"Press","out","Up and slightly back","delt:1,triceps:1,upback:.7,abs:.7","out"),
    ph("up",.4,"Lockout","in","Biceps by ears","delt:.7,triceps:.8,upback:.8,abs:.6"),
    ph("rack",2,"Lower","in","Lower to shoulders","delt:.8,triceps:.6,abs:.5")]},
-   {name:"Half-kneeling · Wk 1–4",poses:{hk,hku},start:"hk",props:[{type:"db1"}],zones:["delt","triceps","abs","glutes@0"],ph:[
-   ph("hk",.5,"Brace","brace","Squeeze back-leg glute","abs:.6,glutes@0:.7"),
-   ph("hku",.8,"Press","out","Press straight up","delt:1,triceps:1,abs:.8,glutes@0:.7","out"),
+   {name:"Half-kneeling · Wk 1–4",poses:{hk,hku},start:"hk",props:[{type:"db1"}],zones:["delt","triceps","abs","glutes@1"],ph:[
+   ph("hk",.5,"Brace","brace","Squeeze the down-knee glute","abs:.6,glutes@1:.7"),
+   ph("hku",.8,"Press","out","Press straight up","delt:1,triceps:1,abs:.8,glutes@1:.7","out"),
    ph("hku",.4,"Lockout","in","Arm by ear","delt:.7,triceps:.8,abs:.7"),
    ph("hk",2,"Lower","in","Lower slowly","delt:.8,triceps:.6,abs:.6")]},
    {name:"Push press · Phase 3",poses:{rack,dip,up},start:"rack",zones:["delt","triceps","quads","glutes"],ph:[
@@ -886,19 +950,19 @@ const ph=(to,d,lab,br,cue,act,e)=>({to,d,lab,br,cue,act:typeof act==="string"?A(
   dose:[["Wk 1–4","Half-kneeling 2–3 × 8–10/side · RIR 3"],["Day A","Standing 3–4 × 6–8 · RIR 2–3 · 2 min"],["Day C","Standing 3–4 × 10–12 · RIR 1–2"],["Day B","Push press 4 × 3–5 · RIR 3+"]],
   focus:["Ribs down, glutes tight","Head through at the top","Dip, don't squat (push press)"],stop:"Lower back arches"});}
 
-/* Countermovement jump */
-{const st=stand(178,{arms:[{a:[5,5]},{a:[5,5]}]});
- const dip=P({hip:[164,190],tor:145,head:25,legs:[{t:[176,AY]},{t:[182,AY]}],arms:[{a:[-45,-35]},{a:[-45,-35]}]});
- const off=P({hip:[180,151],legs:[{t:[176,247],fp:50},{t:[182,247],fp:50}],arms:[{a:[165,170]},{a:[165,170]}]});
- const air=P({hip:[181,124],legs:[{t:[177,219],fp:45},{t:[183,219],fp:45}],arms:[{a:[150,160]},{a:[150,160]}]});
- const touch=P({hip:[180,157],legs:[{t:[176,251],fp:70},{t:[182,251],fp:70}],arms:[{a:[80,80]},{a:[80,80]}]});
- const land=P({hip:[166,188],tor:150,head:20,legs:[{t:[176,AY]},{t:[182,AY]}],arms:[{a:[60,50]},{a:[60,50]}]});
+/* Countermovement jump: quick dip with arms back, full extension through the toes, land toes-first into a soft squat and stick it. */
+{const x=178,J_=o=>stance(Object.assign({x},o));
+ const st=J_({arms:[{a:[4,4]},{a:[4,4]}]});
+ const dip=J_({s:28,q:82,tr:40,head:20,arms:[{a:[-55,-45]},{a:[-55,-45]}]});
+ const toes=(fp,lift,a)=>{const[ax,ay]=toeAnkle(x+23,fp,FY-lift);return J_({x:ax,ay,fp,dx:-2,arms:[{a:[a,a+6]},{a:[a,a+6]}]})};
+ const off=toes(38,0,165),air=toes(30,26,150),touch=toes(50,0,90);
+ const land=J_({s:22,q:58,tr:32,head:15,arms:[{a:[48,62]},{a:[48,62]}]});
  X({id:"cmj",views:["side","front"],lat:{hip:10,sh:19,knee:12,ankle:11,toe:14,elbow:22,hand:23},track:"H",name:"Countermovement jump",group:"main",when:"Phase 3 · Day B",zones:["glutes","quads","calves"],
   clips:[{name:"Jump",poses:{st,dip,off,air,touch,land},start:"st",ph:[
    ph("dip",.35,"Dip","in","Quick dip, arms back","glutes:.6,quads:.6","in"),
    ph("off",.18,"Jump","sharp","Explode, arms up","glutes:1,quads:1,calves:1","out"),
    ph("air",.22,"Air","hold","Tall","calves:.3","out"),
-   ph("touch",.22,"Prepare","hold","Feet under hips","calves:.5,quads:.4","in"),
+   ph("touch",.22,"Prepare","hold","Toes reach for the floor","calves:.5,quads:.4","in"),
    ph("land",.25,"Land","out","Land quietly","quads:1,glutes:.9,calves:.8","out"),
    ph("land",1.5,"Hold","steady","Stick it 1–2 s","quads:.7,glutes:.6"),
    ph("st",.8,"Stand","in","Stand tall","quads:.3"),
@@ -906,62 +970,70 @@ const ph=(to,d,lab,br,cue,act,e)=>({to,d,lab,br,cue,act:typeof act==="string"?A(
   dose:[["Day B","3 × 3 · full reset · 60–90 s"],["First 2 wk","70–80% effort"],["Unlock","12 wk training · deadlift 5 reps ≥ body weight · no joint pain · soft landings on a low-jump test"]],
   focus:["Land soft, knees over toes","Hold each landing"],stop:"Loud landings, knees cave, or pain"});}
 
-/* Bulgarian split squat */
-{const arms=[{a:[2,2]},{a:[2,2]}];
- const top=P({hip:[190,165],tor:172,legs:[{t:[116,204],fp:-95},{t:[222,AY]}],arms}),bot=P({hip:[182,200],tor:162,legs:[{t:[116,204],fp:-95},{t:[222,AY]}],arms});
- const stop=P({hip:[172,169],tor:176,legs:[{t:[126,246],fp:50},{t:[214,AY]}],arms}),sbot=P({hip:[170,200],tor:168,legs:[{t:[126,246],fp:50},{t:[214,AY]}],arms});
+/* Bulgarian split squat: laces of the back foot on a knee-high bench; front thigh reaches parallel, slight forward lean; back knee drops toward the floor. */
+{const ar=[{a:[0,0]},{a:[0,0]}],RA=[104,205];
+ const bs=(hip,tr,rear,fp,fa=214)=>P({hip,tor:180-tr,legs:[{t:rear,fp},{t:[fa,AY]}],arms:ar});
+ const top=bs([184,162],6,RA,-90),bot=bs([176,200],16,RA,-90);
+ const SA=toeAnkle(118,40),stop=bs([174,168],4,SA,40,210),sbot=bs([172,200],12,SA,40,210);
  const P4=[ph("bot",2,"Lower","in","Back knee straight down","quads:.7,glutes:.7,add:.5,hipflex@0~:.8"),
    ph("bot",.4,"Bottom","brace","Feel the back hip stretch","quads:.9,glutes:.9,hipflex@0~:1"),
    ph("top",.9,"Drive","out","Drive through the front foot","quads:1,glutes:1,add:.6","out"),
    ph("top",.5,"Top","in","Stay tall","quads:.4,glutes:.4")];
- X({id:"bss",views:["side","front"],lat:{hip:10,sh:19,knee:[10,13],ankle:[9,13],toe:[9,15],elbow:22,hand:24},track:"H",name:"Bulgarian split squat",group:"legs",inc:[[70,209]],when:"Tue · Thu",zones:["quads","glutes","add","hipflex@0~"],props:[{type:"dbs"}],
-  clips:[{name:"Rear foot elevated · Wk 5+",poses:{top,bot},start:"top",ph:P4,scene:SC.bench(70,132,209),vscene:{front:`<rect x="146" y="209" width="68" height="9" rx="3" class="s-pad"/><rect x="152" y="218" width="6" height="40" class="s-eq"/><rect x="202" y="218" width="6" height="40" class="s-eq"/>`}},{name:"Split squat · Wk 1–4",poses:{top:stop,bot:sbot},start:"top",ph:P4}],
+ X({id:"bss",views:["side","front"],lat:{hip:10,sh:19,knee:[10,13],ankle:[9,13],toe:[9,15],elbow:22,hand:24},track:"H",name:"Bulgarian split squat",group:"legs",inc:[[36,207]],when:"Tue · Thu",zones:["quads","glutes","add","hipflex@0~"],props:[{type:"dbs"}],
+  clips:[{name:"Rear foot elevated · Wk 5+",poses:{top,bot},start:"top",ph:P4,scene:SC.bench(36,108,207),solids:[[36,207,108,216]],vscene:{front:`<rect x="146" y="207" width="68" height="9" rx="3" class="s-pad"/><rect x="152" y="216" width="6" height="42" class="s-eq"/><rect x="202" y="216" width="6" height="42" class="s-eq"/>`}},
+   {name:"Split squat · Wk 1–4",poses:{top:stop,bot:sbot},start:"top",ph:P4}],
   dose:[["Wk 1–4","Split squat 2 × 8–12/side · RIR 3"],["Wk 5+","3 × 8–12/side · RIR 1–2 · 60–90 s"]],
   focus:["Back knee drops straight down","Front knee over toes"],stop:"Knee pain"});}
 
-/* Seated leg curl */
-{const arms=[{t:[156,176]},{t:[158,176]}];
- const ext=P({hip:[140,178],tor:172,legs:[{a:[88,60],fp:150},{a:[90,62],fp:152}],arms}),cur=P({hip:[140,178],tor:172,legs:[{a:[88,-16],fp:74},{a:[90,-18],fp:72}],arms});
- X({id:"legcurl",track:"ankle",name:"Seated leg curl",group:"legs",inc:[[102,100],[220,250]],when:"Tue · Thu",zones:["hams"],props:[{type:"roller"}],
-  scene:`<rect x="102" y="186" width="96" height="11" rx="4" class="s-pad"/><rect x="146" y="197" width="8" height="61" class="s-eq"/><rect x="110" y="250" width="110" height="8" class="s-eq"/>`+SC.line(126,186,134,104,10)+`<rect x="168" y="157" width="38" height="8" rx="4" class="s-pad"/><rect x="198" y="163" width="6" height="24" class="s-eq"/>`,
+/* Seated leg curl: knee lined up with the machine pivot just past the seat edge; thigh pad above the knees; curl to ~110° of knee bend. */
+{const ar=[{t:[160,186]},{t:[162,186]}],hip=[140,177];
+ const ext=P({hip,tor:176,legs:[{a:[90,62],fp:150},{a:[92,64],fp:152}],arms:ar}),cur=P({hip,tor:176,legs:[{a:[90,-20],fp:70},{a:[92,-18],fp:72}],arms:ar});
+ X({id:"legcurl",track:"ankle",name:"Seated leg curl",group:"legs",inc:[[96,100],[236,250]],when:"Tue · Thu",zones:["hams"],props:[{type:"roller"}],solids:[[96,186,176,197]],
+  scene:`<rect x="96" y="186" width="80" height="11" rx="4" class="s-pad"/><rect x="140" y="197" width="8" height="61" class="s-eq"/><rect x="100" y="250" width="120" height="8" class="s-eq"/>`+SC.line(122,186,124,106,10)+`<rect x="168" y="159" width="36" height="8" rx="4" class="s-pad"/><rect x="204" y="152" width="6" height="22" class="s-eq"/>`,
   clips:[{name:"Seated",poses:{ext,cur},start:"ext",ph:[
    ph("cur",1,"Curl","out","Pull the pad under","hams:1","out"),ph("cur",.5,"Squeeze","hold","Squeeze","hams:1"),
    ph("ext",2.5,"Return","in","Slow return","hams:.8"),ph("ext",.4,"Stretch","in","Lean in slightly","hams:.5")]}],
   dose:[["Wk 1–4","2 × 8–12 · RIR 3"],["Wk 5+","3 × 8–12 · RIR 1–2 · 60–90 s"]],focus:["Lean slightly forward","Slow return"],stop:"Cramp or knee pain"});}
 
-/* Calf raise */
-{const cp=(fp,drop=0)=>{const toe=[206,224.5],an=add(toe,U(fp),-16);return P({hip:[an[0]-2-drop*.5,an[1]-95.4+drop],legs:[{t:[an[0]-3,an[1]],fp},{t:an,fp}],arms:[{t:[Math.min(an[0]+56-drop*.5,242),an[1]-141+drop]},{t:[Math.min(an[0]+57-drop*.5,243),an[1]-140+drop]}]})};
+/* Calf raise on a step: balls of the feet on the edge, heels drop ~20° below the step, rise ~45° onto the toes; body stays over the balls of the feet. */
+{const B=[205,228],wall=246;
+ const cp=(fp,bent)=>{const[ax,ay]=fp<80?toeAnkle(B[0]+6,fp,B[1]):ballAnkle(B[0],B[1],fp),hx=B[0]-4;
+   let s,q;if(bent){s=30;q=Math.asin(clamp((ax+L.sh*sn(s)-hx)/L.th,-1,1))/D2R}else{s=Math.asin(clamp((hx-ax)/(L.th+L.sh),-1,1))/D2R;q=-s}
+   const p=stance({x:ax,ay,s,q,tr:3,dx:-1,fp}),S=S_OF(p);return arms(p,{t:[wall-3,S[1]+10]},{t:[wall-3,S[1]+8]})};
  const P4=[ph("up",1,"Rise","out","Rise as high as possible","calves:1","out"),ph("up",1,"Hold","hold","Hold the top","calves:1"),
    ph("dn",2,"Lower","in","Lower into a deep stretch","calves:.8"),ph("dn",2,"Stretch","steady","Pause in the stretch","calves~:.9")];
- X({id:"calf",views:["side","back"],lat:{hip:10,sh:19,knee:11,ankle:10,toe:12,elbow:26,hand:25},vscene:{back:`<rect x="140" y="228" width="80" height="30" rx="2" class="s-eq"/>`},track:"H",name:"Calf raise",group:"legs",inc:[[256,200]],when:"Tue · Thu",zones:["calves","calves~"],scene:SC.step(196,244,228)+SC.wall(246),
-  clips:[{name:"Straight knee",poses:{up:cp(50),dn:cp(105)},start:"dn",ph:P4},{name:"Bent knee",poses:{up:cp(50,14),dn:cp(105,14)},start:"dn",ph:P4}],
+ X({id:"calf",views:["side","back"],lat:{hip:10,sh:19,knee:11,ankle:10,toe:12,elbow:26,hand:25},vscene:{back:`<rect x="140" y="228" width="80" height="30" rx="2" class="s-eq"/>`},track:"H",name:"Calf raise",group:"legs",inc:[[256,200]],when:"Tue · Thu",zones:["calves","calves~"],scene:SC.step(196,244,228)+SC.wall(wall),solids:[[196,228,244,258]],
+  clips:[{name:"Straight knee",poses:{up:cp(48),dn:cp(112)},start:"dn",ph:P4},{name:"Bent knee",poses:{up:cp(48,1),dn:cp(112,1)},start:"dn",ph:P4}],
   dose:[["Wk 1–4","2 × 10–15"],["Wk 5+","3 × 10–15 · every 2nd set bent-knee"]],focus:["Full height at the top","2 s pause in the stretch"],stop:"Achilles pain"});}
 
-/* Chest-supported row + Y-raise */
-{const legs=[{t:[104,AY]},{t:[110,AY]}];
- const hgp=P({hip:[148,192],tor:130,head:15,legs,arms:[{t:[192,216]},{t:[194,216]}]}),rw=P({hip:[148,192],tor:130,head:15,legs,arms:[{t:[178,184]},{t:[180,184]}]});
+/* Chest-supported row + prone Y-raise: chest on a 30° incline bench, toes on the floor behind; arms hang straight, then row the elbows up past the back. */
+{const P0=[118,214],dv=[cs(30),-sn(30)],nm=[-sn(30),-cs(30)],hip=add(add(P0,dv,28),nm,16.5),TA=toeAnkle(66,25);
+ const base=o=>P(Object.assign({hip,tor:120,head:10,legs:[{t:[TA[0]-2,TA[1]],fp:25},{t:TA,fp:25}]},o));
+ const S=S_OF(base({}));
+ const hgp=base({arms:[{t:[S[0]-2,S[1]+72.6]},{t:[S[0],S[1]+72.6]}]}),rw=base({arms:[{t:[S[0]-35,S[1]+49]},{t:[S[0]-33,S[1]+49]}]});
  const rl={hip:10,sh:19,knee:14,ankle:14,toe:17,elbow:22,hand:22};hgp.lat=rl;rw.lat=Object.assign({},rl,{elbow:38,hand:27});
- const yy=P({hip:[148,192],tor:130,head:15,legs,arms:[{a:[128,128]},{a:[128,128]}]}),yh=P({hip:[148,192],tor:130,head:15,legs,arms:[{a:[0,0]},{a:[0,0]}]});
+ const yh=base({arms:[{a:[0,0]},{a:[0,0]}]}),yy=base({arms:[{a:[112,112]},{a:[112,112]}]});
  yh.lat={hip:10,sh:19,knee:14,ankle:14,toe:17,elbow:21,hand:21};yy.lat=Object.assign({},yh.lat,{elbow:32,hand:48});
- const bench=SC.line(158,204,206,162,11)+`<rect x="150" y="204" width="7" height="54" class="s-eq"/><rect x="120" y="250" width="100" height="8" class="s-eq"/><rect x="200" y="166" width="7" height="92" class="s-eq"/>`;
- X({id:"row",views:["side","back"],vscene:{back:`<rect x="158" y="148" width="44" height="62" rx="8" class="s-pad"/><rect x="176" y="208" width="8" height="50" class="s-eq"/><rect x="136" y="250" width="88" height="8" class="s-eq"/>`},name:"Chest-supported row",group:"upper",inc:[[120,250],[220,160]],when:"Tue · Thu",zones:["upback","lats","rdelt","biceps"],props:[{type:"dbs"}],scene:bench,
+ const bench=SC.line(P0[0],P0[1],206,163,11)+`<rect x="150" y="196" width="7" height="62" class="s-eq"/><rect x="112" y="250" width="110" height="8" class="s-eq"/><rect x="198" y="166" width="7" height="92" class="s-eq"/>`;
+ const vb=`<rect x="158" y="148" width="44" height="62" rx="8" class="s-pad"/><rect x="176" y="208" width="8" height="50" class="s-eq"/><rect x="136" y="250" width="88" height="8" class="s-eq"/>`;
+ X({id:"row",views:["side","back"],vscene:{back:vb},name:"Chest-supported row",group:"upper",inc:[[112,250],[222,160]],when:"Tue · Thu",zones:["upback","lats","rdelt","biceps"],props:[{type:"dbs"}],scene:bench,
   clips:[{name:"Row",poses:{hgp,rw},start:"hgp",ph:[
    ph("rw",.9,"Row","out","Elbows up and back","upback:1,lats:.8,rdelt:.9,biceps:.7","out"),ph("rw",.6,"Squeeze","hold","Squeeze shoulder blades","upback:1,rdelt:1,lats:.7"),
    ph("hgp",2,"Lower","in","Lower to full stretch","upback:.6,lats:.6,biceps:.5"),ph("hgp",.4,"Stretch","in","Let blades spread","upback~:.7")]}],
   dose:[["Wk 1–4","2 × 8–12 · RIR 3"],["Wk 5+","3 × 8–12 · RIR 1–2 · 60–90 s"]],focus:["Chest stays on the pad","Elbows 45–60° from body"],stop:"Chest lifts off the pad"});
- X({id:"yraise",views:["side","back"],vscene:{back:`<rect x="158" y="148" width="44" height="62" rx="8" class="s-pad"/><rect x="176" y="208" width="8" height="50" class="s-eq"/><rect x="136" y="250" width="88" height="8" class="s-eq"/>`},name:"Prone Y-raise",group:"upper",when:"Daily flow",zones:["ltrap","rdelt"],scene:bench,
+ X({id:"yraise",views:["side","back"],vscene:{back:vb},name:"Prone Y-raise",group:"upper",inc:[[112,250],[222,160]],when:"Daily flow",zones:["ltrap","rdelt"],scene:bench,
   clips:[{name:"Y-raise",poses:{yh,yy},start:"yh",ph:[
    ph("yy",1,"Raise","out","Thumbs up, arms in a Y","ltrap:1,rdelt:.8","out"),ph("yy",1,"Hold","hold","Shoulders down","ltrap:1,rdelt:.8"),ph("yh",2,"Lower","in","Lower slowly","ltrap:.5,rdelt:.4")]}],
   dose:[["Daily flow","2 × 10 · light"]],focus:["Thumbs up","Shoulders away from ears"],stop:"Shoulder pinch"});}
 
-/* Lateral raise + band ER */
+/* Lateral raise + band external rotation */
 {const base={front:1,hw:10,sw:21,legs:[{a:[-2,-2],fp:-90,fl:.5},{a:[2,2],fp:90,fl:.5}]};
- const dn=P(Object.assign({arms:[{a:[-7,-7]},{a:[7,7]}]},base)),upp=P(Object.assign({arms:[{a:[-88,-84]},{a:[88,84]}]},base));
+ const dn=P(Object.assign({arms:[{a:[-8,-5]},{a:[8,5]}]},base)),upp=P(Object.assign({arms:[{a:[-86,-80]},{a:[86,80]}]},base));
  X({id:"latraise",name:"Lateral raise",group:"upper",labels:"top",when:"Tue · Thu",zones:["delt"],props:[{type:"dbF"}],
   clips:[{name:"Front view",poses:{dn,upp},start:"dn",ph:[
    ph("upp",1,"Raise","out","Out to the sides, elbows lead","delt:1","out"),ph("upp",.4,"Top","hold","Shoulder height","delt:1"),
    ph("dn",2,"Lower","in","Lower slowly","delt:.7"),ph("dn",.4,"Bottom","in","Keep tension","delt:.3")]}],
-  dose:[["Wk 1–4","2 × 12–20"],["Wk 5+","3 × 12–20 · RIR 1–2 · 60 s"]],focus:["Elbows lead","Stop at shoulder height"],stop:"Shoulder pinch"});
+  dose:[["Wk 1–4","2 × 12–20"],["Wk 5+","3 × 12–20 · RIR 1–2 · 60 s"]],focus:["Elbows lead, slight bend","Stop at shoulder height"],stop:"Shoulder pinch"});
  const tb2={front:1,top:1,hideLegs:1,hip:[180,150],tor:180,ts:.35,head:180,hw:12,sw:24,legs:[{a:[0,0],s:[.01,.01],fl:0},{a:[0,0],s:[.01,.01],fl:0}]};
  const B2=f=>P(Object.assign({},tb2,{arms:[{a:[-90,-90],s:[.18,.15]},{a:[0,f],s:[.2,1]}]}));
  const across=B2(-75),fwd=B2(0),out=B2(60);
@@ -971,34 +1043,35 @@ const ph=(to,d,lab,br,cue,act,e)=>({to,d,lab,br,cue,act:typeof act==="string"?A(
    ph("across",2,"Return","in","Return slowly","cuff@1:.6")]}],
   dose:[["Daily flow","2 × 15/side · light band"]],focus:["Elbow pinned to your side","Towel roll under the elbow"],stop:"Front-shoulder pain"});}
 
-/* Hanging knee / leg raise */
-{const arms=[{t:[204,30]},{t:[206,30]}];
- const hb=hang(203,93,186,{arms,legs:[{a:[2,0],fp:75},{a:[4,0],fp:75}]});
- const kn=hang(203,93,194,{arms,legs:[{a:[100,8],fp:95},{a:[104,10],fp:95}]}),lg=hang(203,93,198,{arms,legs:[{a:[86,86],fp:178},{a:[90,90],fp:178}]});
+/* Hanging knee / leg raise: dead hang, then curl the pelvis up so the hips tilt back, not just the legs. */
+{const bx=206,by=0,hand=[{t:[bx-1,by+1]},{t:[bx+1,by+1]}];
+ const hb=arms(hangS([bx-4,by+72.6],183,{legs:[{a:[4,4],fp:15},{a:[2,2],fp:15}]}),...hand);
+ const kn=arms(hangS([bx-6,by+72],200,{legs:[{a:[104,8],fp:40},{a:[100,4],fp:40}]}),...hand);
+ const lg=arms(hangS([bx-7,by+72],206,{legs:[{a:[96,96],fp:178},{a:[92,92],fp:176}]}),...hand);
  const P4=[ph("t",1,"Raise","out","Curl the pelvis up","abs:1,hipflex:.8,forearm:.6","out"),ph("t",.5,"Top","hold","Hold","abs:1,hipflex:.7"),
    ph("hb",2,"Lower","in","Lower slowly","abs:.7,hipflex:.6"),ph("hb",.6,"Still","in","Stop the swing","forearm:.6")];
- X({id:"hangraise",track:"knee",name:"Hanging knee / leg raise",group:"core",when:"Tue · Thu",zones:["abs","hipflex","forearm"],scene:SC.bar(206,30),
+ X({id:"hangraise",track:"knee",name:"Hanging knee / leg raise",group:"core",inc:[[206,by-8]],when:"Tue · Thu",zones:["abs","hipflex","forearm"],scene:SC.bar(bx,by),
   clips:[{name:"Knee raise",poses:{hb,t:kn},start:"hb",ph:P4},{name:"Leg raise",poses:{hb,t:lg},start:"hb",ph:P4}],
   dose:[["Wk 1–4","Knee raise 2 × 8–12"],["Wk 5+","3 × 8–12 · leg raise at 3 × 12"]],focus:["Tuck the pelvis up","No swinging"],stop:"Shoulder pain or swinging"});}
 
-/* Woodchop */
-{const b={front:1,hip:[170,200],hw:10,sw:20,legs:[{a:[-12,0],s:[.35,.78],fp:-90,fl:.5},{a:[2,0],s:[1,.15],fp:90,fl:.35}]};
+/* Half-kneeling woodchop, front view: knee nearest the cable is up, the other knee rests on a pad; hips stay square while the ribs rotate. */
+{const b={front:1,hip:[170,199],hw:10,sw:20,legs:[{a:[-86,0],s:[.26,1],fp:-90,fl:.5},{a:[1,180],s:[1,.12],fp:90,fl:0}]};
  const S_=(tor,rot,look,arms)=>P(Object.assign({},b,{tor,rot,look,arms}));
- const hiS=S_(195,-45,-.6,[{t:[128,96],k:1},{t:[130,98],k:1}]),loE=S_(168,50,.6,[{t:[200,192],k:-1},{t:[204,190],k:-1}]);
- const loS=S_(195,-45,-.6,[{t:[140,198],k:-1},{t:[144,196],k:-1}]),hiE=S_(168,50,.6,[{t:[212,96],k:1},{t:[214,98],k:1}]);
- const pad=`<rect x="170" y="249" width="26" height="9" rx="3" class="s-pad"/>`;
+ const hiS=S_(195,-45,-.6,[{t:[128,94],k:1},{t:[130,96],k:1}]),loE=S_(168,50,.6,[{t:[202,190],k:-1},{t:[206,188],k:-1}]);
+ const loS=S_(195,-45,-.6,[{t:[140,196],k:-1},{t:[144,194],k:-1}]),hiE=S_(168,50,.6,[{t:[214,94],k:1},{t:[216,96],k:1}]);
+ const pad=`<rect x="166" y="252" width="30" height="6" rx="2" class="s-pad"/>`;
  const P4=(l,c)=>[ph("e",.9,l,"out",c,"obl:1,abs:.8,delt:.6,glutes@1:.6","out"),ph("e",.3,"Finish","hold","Hips stay square","obl:.9,abs:.7,glutes@1:.6"),
    ph("s",2,"Return","in","Resist the cable","obl:.7,abs:.5"),ph("s",.3,"Reset","in","Arms long","obl:.3")];
- X({id:"chop",name:"Half-kneeling woodchop",group:"core",when:"Mon · Wed · Fri",zones:["obl","abs","delt","glutes@1"],
+ X({id:"chop",name:"Half-kneeling woodchop",group:"core",when:"Mon · Wed · Fri",zones:["obl","abs","delt","glutes@1"],note:"FRONT VIEW · RIGHT KNEE DOWN",
   clips:[{name:"High → low",poses:{s:hiS,e:loE},start:"s",ph:P4("Chop","Diagonal down, rotate through ribs"),props:[{type:"cable",ax:22,ay:22}],scene:pad+SC.anchor(22,22)},
    {name:"Low → high",poses:{s:loS,e:hiE},start:"s",ph:P4("Lift","Diagonal up, rotate through ribs"),props:[{type:"cable",ax:22,ay:244}],scene:pad+SC.anchor(22,244)}],
   dose:[["Wk 1–4","2 × 8–10/side"],["Wk 5+","3 × 8–10/side · RIR 2–3"],["Direction","Alternate each session"]],focus:["Hips square, kneeling glute tight","Arms long"],stop:"Low-back pain"});}
 
 /* Landmine rotation (replaces med-ball throw) */
 {const b={front:1,hw:11,sw:20},lg=(f0,f1)=>[{t:[150,AY],k:1,fp:f0,fl:.5},{t:[210,AY],k:-1,fp:f1,fl:.5}];
- const L_=P(Object.assign({},b,{hip:[170,172],tor:200,rot:-60,look:-.8,legs:lg(-90,40),arms:[{t:[140,174],k:-1},{t:[144,174],k:-1}]}));
- const T_=P(Object.assign({},b,{hip:[180,164],tor:180,rot:0,legs:lg(-90,90),arms:[{t:[176,118],k:1},{t:[184,118],k:-1}]}));
- const R_=P(Object.assign({},b,{hip:[190,172],tor:160,rot:60,look:.8,legs:lg(-140,90),arms:[{t:[216,174],k:1},{t:[220,174],k:1}]}));
+ const L_=P(Object.assign({},b,{hip:[170,168],tor:200,rot:-60,look:-.8,legs:lg(-90,40),arms:[{t:[140,170],k:-1},{t:[144,170],k:-1}]}));
+ const T_=P(Object.assign({},b,{hip:[180,160],tor:180,rot:0,legs:lg(-90,90),arms:[{t:[176,114],k:1},{t:[184,114],k:-1}]}));
+ const R_=P(Object.assign({},b,{hip:[190,168],tor:160,rot:60,look:.8,legs:lg(-140,90),arms:[{t:[216,170],k:1},{t:[220,170],k:1}]}));
  X({id:"landmine",name:"Landmine rotation",group:"core",when:"Mon · Wed · Fri",zones:["obl","abs","glutes@b","delt"],props:[{type:"landmine",ax:180,ay:252}],scene:SC.anchor(180,252),
   clips:[{name:"Front view",poses:{L_,T_,R_},start:"L_",ph:[
    ph("T_",.3,"Drive","sharp","Hips turn first, bar arcs up","obl:1,abs:.9,glutes@b:1,delt:.7","out"),
@@ -1010,10 +1083,13 @@ const ph=(to,d,lab,br,cue,act,e)=>({to,d,lab,br,cue,act:typeof act==="string"?A(
   dose:[["Lift days","3 × 5/side (alternating) · first after warm-up · rest 60 s"],["Load","Empty bar; add 2.5–5 kg only if speed stays high"],["Wk 1–2","Slow and controlled to learn the arc"]],
   focus:["Hips lead, arms stay long","Pivot the back foot","Fast up, controlled stop at the hip"],stop:"Bar slows or low-back pain"});}
 
-/* Side plank + leg raise */
-{const mk=(tor,legD,topD,S)=>{const p=P({front:1,hip:[0,0],tor,hw:8,sw:9});p.hip=add(S,U(tor),-58);const thip=add(p.hip,U(tor-90),-8);
-   p.legs=[limb({a:[topD,topD],fp:topD,fl:.35},-1),limb({a:[legD,legD],fp:legD,fl:.35},-1)];p.arms=[limb({t:[thip[0]+6,thip[1]-5],k:1},1),limb({a:[0,90]},1)];return p};
- const S=[205,209.3],dn=mk(114,-83,-83,S),up=mk(105,-76,-76,S),raise=mk(105,-76,-108,S);
+/* Side plank + leg raise, seen from the front: elbow under the shoulder, feet stacked, one straight line; the top leg lifts ~25°. */
+{const ex=212,EY=FY-5;
+ const sp=(th,ld,top)=>{const tor=90+th,pr=U(tor-90),S=add([ex,EY-L.ua],pr,-9),p=P({front:1,hip:add(S,U(tor),-L.to),tor,hw:8,sw:9});
+   p.legs=[limb({a:[ld-top,ld-top],fp:ld-top,fl:.4},-1),limb({a:[ld,ld],fp:ld,fl:.4},-1)];
+   const th0=add(p.hip,pr,-8);p.arms=[limb({t:[th0[0]+6,th0[1]-6],k:1},1),limb({a:[0,90],s:[1,.55]},1)];return p};
+ const thU=solve(th=>compute(sp(th,th-90,0)).ankles[1][1],0,40,FY-8.5),thD=solve(th=>compute(sp(th,-89,0)).hips[1][1],0,60,FY-9);
+ const dn=sp(thD,-89,0),up=sp(thU,thU-90,0),raise=sp(thU,thU-90,25);
  X({id:"sideplank",track:"ankle0",name:"Side plank + leg raise",group:"core",when:"Tue · Thu",zones:["gmed@b","obl","delt@1"],
   clips:[{name:"Front view",poses:{dn,up,raise},start:"dn",ph:[
    ph("up",1,"Lift","out","Hips up, straight line","obl:.9,gmed@b:.7,delt@1:.6","out"),
@@ -1023,38 +1099,43 @@ const ph=(to,d,lab,br,cue,act,e)=>({to,d,lab,br,cue,act:typeof act==="string"?A(
    ph("dn",1,"Rest","in","Hips down","obl:.2")]}],
   dose:[["Wk 1–4","2 × 20–40 s/side · 5 leg raises"],["Wk 5+","3 × 20–40 s/side · 5–10 leg raises"]],focus:["Elbow under shoulder","Knees down if needed (Wk 1–4)"],stop:"Hips sag or shoulder pain"});}
 
-/* Copenhagen plank */
-{const mk=(tor,bot,knee,lever)=>{const pr=U(tor-90),hip0=add(knee,U(tor),lever==="short"?50:96),p=P({front:1,hip:add(hip0,pr,8),tor,hw:8,sw:9});
-   p.legs=[limb(lever==="short"?{a:[tor+180,-90],fp:0,fl:.5}:{a:[tor+180,tor+180],fp:tor+180,fl:.35},-1),limb({a:[bot,bot],fp:bot,fl:.35},-1)];
-   p.arms=[limb({a:[-60,-150]},1),limb({a:[0,90]},1)];return p};
- const P4=[ph("u",1,"Lift","out","Press the bench, hips up","add@0:1,obl:.8,gmed@1:.6","out"),
+/* Copenhagen plank, seen from the front: elbow on the floor, top leg on a bench (knee for short lever, ankle for long), bottom leg lifts up to the bench. */
+{const ex=230,EY=FY-5,bTop=206;
+ const cp=(th,lever,dn)=>{const tor=90+th,pr=U(tor-90),S=add([ex,EY-L.ua],pr,-9),p=P({front:1,hip:add(S,U(tor),-L.to),tor,hw:8,sw:9}),ld=tor-180;
+   p.legs=[limb(lever==="short"?{a:[ld,-90],fp:-90,fl:.4}:{a:[ld,ld],fp:ld,fl:.4},-1),limb({a:[dn,dn],fp:dn,fl:.4},-1)];
+   p.arms=[limb({a:[-60,-150]},1),limb({a:[0,90],s:[1,.55]},1)];return p};
+ const mk=lever=>{const th=solve(t=>{const J=compute(cp(t,lever,0));return(lever==="short"?J.knees[0][1]+6.2:J.ankles[0][1]+6.5)},-40,30,bTop),ld=th-90;
+   const ank=a=>compute(cp(th,lever,a)).ankles[1][1],dA=solve(ank,ld-10,ld+70,FY-9.5),uA=solve(ank,ld-10,ld+70,bTop+19);
+   const d=cp(th,lever,dA),u=cp(th,lever,uA),J=compute(u),cx=lever==="short"?J.knees[0][0]:J.ankles[0][0],x1=lever==="short"?cx-62:cx-40,x2=cx+3;
+   return{poses:{d,u},scene:`<rect x="${f1(x1)}" y="${bTop}" width="${f1(x2-x1)}" height="9" rx="3" class="s-pad"/><rect x="${f1(x1+6)}" y="${bTop+9}" width="6" height="${FY-bTop-9}" class="s-eq"/>`,solids:[[x1,bTop,x2,bTop+9]],inc:[[x1,bTop]]}};
+ const sh=mk("short"),lo=mk("long");
+ const P4=[ph("u",1,"Lift","out","Press the bench, bottom leg up","add@0:1,obl:.8,gmed@1:.6","out"),
    ph("u",2,"Hold","steady","Hold 15–30 s, keep breathing","add@0:1,obl:.9,gmed@1:.6"),
    ph("d",1.5,"Lower","in","Lower slowly","add@0:.7,obl:.6"),ph("d",.8,"Reset","in","Reset","add@0:.3")];
- X({id:"copenhagen",track:"ankle",name:"Copenhagen plank",group:"core",inc:[[18,181]],when:"Tue · Thu",zones:["add@0","obl","gmed@1"],
-  clips:[{name:"Short lever",poses:{d:mk(80,-60,[98,182],"short"),u:mk(80,-96,[98,182],"short")},start:"d",ph:P4,scene:SC.bench(18,100,189)},
-   {name:"Long lever",poses:{d:mk(80,-63,[96,174],"long"),u:mk(80,-97,[96,174],"long")},start:"d",ph:P4,scene:SC.bench(18,100,181)}],
+ X({id:"copenhagen",track:"ankle",name:"Copenhagen plank",group:"core",when:"Tue · Thu",zones:["add@0","obl","gmed@1"],
+  clips:[{name:"Short lever",start:"d",ph:P4,...sh},{name:"Long lever",start:"d",ph:P4,...lo}],
   dose:[["Start","Short lever 2 × 15–30 s/side"],["Then","3 × 15–30 s · long lever once 30 s is easy"]],focus:["Top leg presses the bench","Straight line, hips up"],stop:"Sharp groin pain"});}
 
 /* Pelvic floor */
-{const ps=P({hip:[150,208],legs:[{a:[88,0]},{a:[90,0]}],arms:[{t:[180,201]},{t:[182,201]}]});
- X({id:"pelvic",track:"none",name:"Pelvic floor squeeze",group:"core",inc:[[108,214]],when:"Optional · daily",zones:["pf"],scene:SC.bench(108,190,214),
+{const ps=P({hip:[150,202],legs:[{t:[196,AY]},{t:[198,AY]}],arms:[{t:[180,195]},{t:[182,195]}]});
+ X({id:"pelvic",track:"none",name:"Pelvic floor squeeze",group:"core",inc:[[108,210]],when:"Optional · daily",zones:["pf"],scene:SC.bench(108,190,210),solids:[[108,210,190,219]],
   clips:[{name:"Seated",poses:{ps},start:"ps",ph:[
    ph("ps",3,"Relax","in","Breathe in, let go",{}),ph("ps",1,"Lift","out","Lift up and in","pf:1"),
    ph("ps",5,"Hold","steady","Hold 5 s, keep breathing","pf:1"),ph("ps",2,"Release","in","Let go fully",{})]}],
   dose:[["Daily","3 × 10 · 5 s hold"]],focus:["Glutes and thighs stay relaxed","Relax fully between reps"],stop:"Pelvic pain"});}
 
-/* 4-way neck */
-{const bench=SC.bench(40,214,198);
- const sup=h=>{const p=P({hip:[150,186],tor:90,flip:1,head:h,legs:[{a:[-90,-90],fp:180,fl:.7},{a:[-91,-91],fp:180,fl:.7}]});const J=compute(p);const fh=add(J.HC,U(J.face),17);p.arms=[limb({t:[fh[0]-2,fh[1]],k:-1},1),limb({t:fh,k:-1},1)];return p};
- const pro=h=>P({hip:[150,186],tor:90,head:h,legs:[{a:[-90,-90],fp:0,fl:.6},{a:[-91,-91],fp:0,fl:.6}],arms:[{a:[0,0]},{a:[3,3]}]});
- const lat=h=>P({front:1,hip:[150,182],tor:90,hw:8,sw:10,head:h,legs:[{a:[-90,-90],fp:-90,fl:.5},{a:[-90,-90],fp:-90,fl:.5}],arms:[{a:[-80,-80]},{a:[0,0]}]});
+/* 4-way neck: lying on a bench with the head off the end */
+{const bt=198,bench=SC.bench(40,214,bt);
+ const sup=h=>{const p=P({hip:[150,bt-11],tor:90,flip:1,head:h,legs:[{a:[-90,-90],fp:180,fl:.9},{a:[-91,-91],fp:180,fl:.9}]});const J=compute(p);const fh=add(J.HC,U(J.face),17);p.arms=[limb({t:[fh[0]-2,fh[1]],k:-1},1),limb({t:fh,k:-1},1)];return p};
+ const pro=h=>P({hip:[150,bt-11],tor:90,head:h,legs:[{a:[-90,-90],fp:-60,fl:.9},{a:[-91,-91],fp:-60,fl:.9}],arms:[{a:[-92,-92]},{a:[-90,-90]}]});
+ const lat=h=>P({front:1,hip:[150,bt-17],tor:90,hw:8,sw:10,head:h,legs:[{a:[-90,-90],fp:-90,fl:.5},{a:[-90,-90],fp:-90,fl:.5}],arms:[{a:[-84,-84]},{a:[-92,-92]}]});
  const P5=(k,l,c)=>[ph("up",1,"Lift","out",c,k+":1","out"),ph("up",.6,"Hold","hold","Hold",k+":1"),ph("dn",2,"Lower","in","Lower slowly",k+":.7"),ph("dn",.4,"Reset","in",l,k+":.3")];
- X({id:"neck",track:"HC",name:"4-way neck",group:"neck",inc:[[40,198],[240,198]],when:"Mon · Wed · Fri",zones:["neckF"],
+ X({id:"neck",track:"HC",name:"4-way neck",group:"neck",inc:[[40,bt],[240,bt]],when:"Mon · Wed · Fri",zones:["neckF"],solids:[[40,bt,214,bt+9]],
   clips:[{name:"Flexion",poses:{ext:sup(-18),tuck:sup(0),curl:sup(48)},start:"ext",props:[{type:"headplate"}],scene:bench,zones:["neckF"],ph:[
     ph("tuck",.6,"Tuck","out","Tuck the chin first","neckF:.6"),ph("curl",1,"Curl","out","Curl head toward chest","neckF:1","out"),
     ph("curl",.6,"Hold","hold","Hold","neckF:1"),ph("ext",2,"Lower","in","Lower slowly","neckF:.7"),ph("ext",.4,"Reset","in","Reset","neckF:.3")]},
    {name:"Extension",poses:{dn:pro(-45),up:pro(12)},start:"dn",props:[{type:"harness"}],scene:bench,zones:["neckB"],ph:P5("neckB","Reset","Lift head to level")},
-   {name:"Side bend",poses:{dn:lat(-25),up:lat(32)},start:"dn",scene:SC.bench(40,214,203),zones:["neckS"],ph:P5("neckS","Switch sides after the set","Ear toward shoulder")}],
+   {name:"Side bend",poses:{dn:lat(-25),up:lat(32)},start:"dn",scene:bench,zones:["neckS"],ph:P5("neckS","Switch sides after the set","Ear toward shoulder")}],
   dose:[["Wk 1–4","Hand-resisted holds · 2 × 10 s/direction · ~50%"],["Wk 5+","Head weight · 3 × 15–25/direction"],["Load","+1–2.5 kg at 3 × 25 · drop to 15 reps"],["Daily","Chin tuck 2 × 10 · 5 s hold"]],
   focus:["Slow, never jerk","Towel under any plate"],stop:"Dizziness, headache or arm tingling"});}
 
@@ -1075,16 +1156,20 @@ const ph=(to,d,lab,br,cue,act,e)=>({to,d,lab,br,cue,act:typeof act==="string"?A(
   focus:["Slow, controlled holds","Body-fat loss changes the face most"],stop:"Jaw clicking or pain"});}
 
 /* Mobility */
-{const lungeA=P({hip:[172,205],tor:100,head:10,legs:[{t:[100,243],fp:40},{t:[238,AY]}],arms:[{t:[222,AY]},{t:[226,AY]}]});
- const elbow=P({hip:[172,210],tor:97,head:10,legs:[{t:[100,243],fp:40},{t:[238,AY]}],arms:[{t:[222,AY]},{a:[5,60]}]});
- const reach=P({hip:[172,205],tor:100,head:30,flip:1,legs:[{t:[100,243],fp:40},{t:[238,AY]}],arms:[{t:[222,AY]},{a:[180,180]}]});
- {const lw={hip:10,sh:19,knee:[10,13],ankle:[9,13],toe:[9,15],elbow:[20,22],hand:[6,8]};lungeA.lat=lw;elbow.lat=Object.assign({},lw,{elbow:[20,10],hand:[6,12]});reach.lat=Object.assign({},lw,{elbow:[20,21],hand:[6,21]});}
- X({id:"wgs",name:"World's greatest stretch",group:"mob",when:"Daily flow",zones:["hipflex@0~","hams@1~","upback~"],
+/* World's greatest stretch: deep lunge, back knee off the floor; elbow toward the front instep, then rotate open and reach to the ceiling. */
+{const fa=212,TB=toeAnkle(98,40),lg=[{t:TB,fp:40},{t:[fa,AY]}];
+ const hipA=legUp(fa,AY,10,80),hipE=legUp(fa,AY,10,88);
+ const lungeA=P({hip:hipA,tor:102,head:4,pf:1,legs:lg,arms:[{t:[218,FY-4.5]},{t:[226,FY-4.5]}]});
+ /* every pose pins the arms by target so the in-between frames interpolate cleanly */
+ const elbow=P({hip:hipE,tor:96,head:0,pf:1,legs:lg}),SE=S_OF(elbow),EE=add(SE,U(-15),L.ua);arms(elbow,{t:[218,FY-4.5]},{t:add(EE,U(150),L.fa)});
+ const reach=P({hip:hipA,tor:102,head:40,flip:.5,pf:1,legs:lg}),SR=S_OF(reach);arms(reach,{t:[218,FY-4.5]},{t:add(SR,[1,-72.4])});
+ X({id:"wgs",name:"World's greatest stretch",group:"mob",when:"Daily flow · warm-up",zones:["hipflex@0~","hams@1~","upback~"],
   clips:[{name:"Lunge + reach",poses:{lungeA,elbow,reach},start:"lungeA",ph:[
-   ph("elbow",1.5,"Elbow","out","Elbow to front instep","hipflex@0~:1,hams@1~:.6"),ph("elbow",1,"Hold","steady","Back leg long","hipflex@0~:1,hams@1~:.6"),
-   ph("reach",1.5,"Reach","in","Rotate, reach up","upback~:1,hipflex@0~:.7"),ph("reach",1,"Hold","steady","Eyes on your hand","upback~:1,hipflex@0~:.7"),
+   ph("elbow",1.5,"Elbow","out","Elbow toward the front instep","hipflex@0~:1,hams@1~:.6"),ph("elbow",1,"Hold","steady","Back leg long","hipflex@0~:1,hams@1~:.6"),
+   ph("lungeA",.8,"Hand down","in","Hand back to the floor","hipflex@0~:.8"),
+   ph("reach",1.5,"Reach","in","Rotate open, reach up","upback~:1,hipflex@0~:.7"),ph("reach",1,"Hold","steady","Eyes on your hand","upback~:1,hipflex@0~:.7"),
    ph("lungeA",1,"Return","out","Hand down","hipflex@0~:.5")]}],
-  dose:[["Daily flow","5/side"]],focus:["Back leg long","Eyes follow the hand"],stop:"Hip pinch"});
+  dose:[["Daily flow","5/side"],["Warm-up","3/side"]],focus:["Back leg long, knee off the floor","Eyes follow the hand"],stop:"Hip pinch"});
 
  const tb={front:1,top:1,armsBack:1,hip:[180,150],tor:180,ts:.42,head:180,hw:13,sw:22,arms:[{a:[-160,-165],s:[.55,.55]},{a:[160,165],s:[.55,.55]}]};
  const nA=P(Object.assign({},tb,{legs:[{a:[-30,60],fp:150,fl:.5},{a:[120,210],fp:300,fl:.5}]}));
@@ -1097,7 +1182,7 @@ const ph=(to,d,lab,br,cue,act,e)=>({to,d,lab,br,cue,act:typeof act==="string"?A(
    ph("nM",.7,"Switch","in","Knees back over","glutes@1~:.3"),ph("nA",.7,"Switch","in","Return",{})]}],
   dose:[["Daily flow","8 switches/side"]],focus:["Sit tall","Knees move together"],stop:"Knee pain"});
 
- const ob={hip:[150,170],tor:90,legs:[{a:[0,-90],fp:-90,fl:.6},{a:[2,-88],fp:-90,fl:.6}]};
+ const ob={hip:[150,170],tor:90,pf:1,legs:[{a:[0,-90],fp:-90,fl:.6},{a:[2,-88],fp:-90,fl:.6}]};
  const o0=P(Object.assign({},ob,{flip:-1,arms:[{a:[2,2]},{a:[0,0]}]})),o1=P(Object.assign({},ob,{flip:-.2,arms:[{a:[2,2]},{a:[0,0],s:[.12,.12]}]}));
  const o2=P(Object.assign({},ob,{flip:-.1,arms:[{a:[2,2]},{a:[180,180],s:[.12,.12]}]})),o3=P(Object.assign({},ob,{flip:1,arms:[{a:[2,2]},{a:[180,180]}]}));
  X({id:"openbook",name:"Thoracic open book",group:"mob",when:"Daily flow",noFloor:1,track:"none",scene:`<rect x="70" y="108" width="196" height="132" rx="16" class="s-mat"/>`,zones:["chest~","upback~"],note:"VIEW FROM ABOVE · LYING ON YOUR SIDE",labels:"top",
@@ -1108,18 +1193,22 @@ const ph=(to,d,lab,br,cue,act,e)=>({to,d,lab,br,cue,act:typeof act==="string"?A(
    ph("o0",1,"Close","in","Palms together",{},"out")]}],
   dose:[["Daily flow","8/side"]],focus:["Knees stay stacked","Eyes follow the hand"],stop:"Shoulder pinch"});
 
- const sqS=P({hip:[182,AY-95.5],legs:[{t:[176,AY]},{t:[182,AY]}],arms:[{t:[228,140],k:-1},{t:[229,141],k:-1}]});
- const sqD=P({hip:[164,226],tor:140,head:30,legs:[{t:[176,AY]},{t:[182,AY]}],arms:[{t:[228,176],k:-1},{t:[229,177],k:-1}]});
- X({id:"squathold",views:["side","back"],lat:{hip:12,sh:19,knee:26,ankle:17,toe:24,elbow:13,hand:5},vscene:{back:`<rect x="177" y="-200" width="6" height="458" rx="2" class="s-eq"/>`},track:"H",name:"Deep squat hold",group:"mob",labels:"top",inc:[[240,140]],when:"Daily flow",zones:["calves~","glutes~","add~"],scene:SC.pole(232),
-  clips:[{name:"With support",poses:{sqS,sqD},start:"sqS",ph:[
-   ph("sqD",2.5,"Sink","in","Sit between your heels","glutes~:.5"),ph("sqD",5,"Hold","steady","Breathe 4 s in, 6 s out","calves~:1,glutes~:1,add~:.9"),
-   ph("sqS",1.5,"Stand","out","Stand with support",{}),ph("sqS",1,"Rest","steady","Repeat to 60 s",{})]}],
-  dose:[["Daily flow","60 s total · 2–3 holds"]],focus:["Heels down, chest up"],stop:"Knee pain"});
+ /* deep squat hold: heels down, hips below knees, knees forward over the toes, holding a pole */
+ {const x=182,pole=244;
+  const sqS=stance({x,arms:[{t:[pole-1,128]},{t:[pole,129]}]});
+  const sqD=stance({x,s:38,q:125,tr:34,head:22,arms:[{t:[pole-1,200]},{t:[pole,201]}]});
+  X({id:"squathold",views:["side","back"],lat:{hip:12,sh:19,knee:26,ankle:17,toe:24,elbow:13,hand:5},vscene:{back:`<rect x="177" y="-200" width="6" height="458" rx="2" class="s-eq"/>`},track:"H",name:"Deep squat hold",group:"mob",labels:"top",inc:[[252,140]],when:"Daily flow",zones:["calves~","glutes~","add~"],scene:SC.pole(pole+1),
+   clips:[{name:"With support",poses:{sqS,sqD},start:"sqS",ph:[
+    ph("sqD",2.5,"Sink","in","Sit between your heels","glutes~:.5"),ph("sqD",5,"Hold","steady","Breathe 4 s in, 6 s out","calves~:1,glutes~:1,add~:.9"),
+    ph("sqS",1.5,"Stand","out","Stand with support",{}),ph("sqS",1,"Rest","steady","Repeat to 60 s",{})]}],
+   dose:[["Daily flow","60 s total · 2–3 holds"]],focus:["Heels down, chest up"],stop:"Knee pain"});}
 
- const tdn=P({hip:[120,165],tor:184,legs:[{t:[152,AY]},{t:[155,AY]}],arms:[{a:[5,5]},{a:[5,5]}]}),tup=P({hip:[120,165],tor:184,legs:[{t:[152,AY],fp:128},{t:[155,AY],fp:128}],arms:[{a:[5,5]},{a:[5,5]}]});
- X({id:"tib",track:"toe",name:"Tibialis raise",group:"mob",inc:[[96,160]],when:"Daily flow",zones:["tib"],scene:SC.wallL(106),
-  clips:[{name:"Back to wall",poses:{tdn,tup},start:"tdn",ph:[ph("tup",1,"Up","out","Toes up, heels down","tib:1","out"),ph("tup",1,"Hold","hold","Hold","tib:1"),ph("tdn",2,"Lower","in","Lower slowly","tib:.6")]}],
-  dose:[["Daily flow","2 × 15"]],focus:["Heels stay down"],stop:"Shin pain"});
+ /* tibialis raise: upper back on the wall, feet a foot-length out, toes up while heels stay down */
+ {const ax=140,phi=9,hip=add([ax,AY],U(180+phi),95.6),tb_=fp=>P({hip,tor:180+phi,legs:[{t:[ax-2,AY],fp},{t:[ax,AY],fp}],arms:[{a:[4,4]},{a:[4,4]}]});
+  const tdn=tb_(90),tup=tb_(120);
+  X({id:"tib",track:"toe",name:"Tibialis raise",group:"mob",inc:[[96,160]],when:"Daily flow",zones:["tib"],scene:SC.wallL(106),
+   clips:[{name:"Back to wall",poses:{tdn,tup},start:"tdn",ph:[ph("tup",1,"Up","out","Toes up, heels down","tib:1","out"),ph("tup",1,"Hold","hold","Hold","tib:1"),ph("tdn",2,"Lower","in","Lower slowly","tib:.6")]}],
+   dose:[["Daily flow","2 × 15"]],focus:["Heels stay down"],stop:"Shin pain"});}
 
  X({id:"shortfoot",name:"Short-foot hold",group:"mob",when:"Daily flow",render:"foot",
   clips:[{name:"Foot, side view",poses:{f0:{arch:0},f1:{arch:1}},start:"f0",ph:[
@@ -1127,14 +1216,90 @@ const ph=(to,d,lab,br,cue,act,e)=>({to,d,lab,br,cue,act:typeof act==="string"?A(
    ph("f1",5,"Hold","steady","Toes long, hold 5 s","arch:1"),ph("f0",1,"Relax","in","Relax",{})]}],
   dose:[["Daily flow","2 × 5 holds · 5 s/foot"]],focus:["Don't curl the toes","Big toe stays down"],stop:"Cramp"});
 
- const pg=P({hip:[178,160],legs:[{t:[176,AY]},{t:[182,AY]}],arms:[{a:[10,30]},{a:[10,30]}]});
- const pp=P({hip:[178,151],legs:[{t:[176,246],fp:58},{t:[182,246],fp:58}],arms:[{a:[6,24]},{a:[6,24]}]});
- const pa=P({hip:[178,143],legs:[{t:[176,238],fp:55},{t:[182,238],fp:55}],arms:[{a:[4,20]},{a:[4,20]}]});
- X({id:"pogo",track:"none",name:"Pogo hops",group:"mob",when:"Phase 3 · Day B",zones:["calves"],
-  clips:[{name:"Small hops",poses:{pg,pp,pa},start:"pg",ph:[
-   ph("pp",.12,"Push","steady","Stiff ankles, push off","calves:1","out"),ph("pa",.14,"Air","steady","Small hop","calves:.3","out"),
-   ph("pp",.12,"Land","steady","Land quietly","calves:.9","in"),ph("pg",.1,"Bounce","steady","Bounce right back","calves:1","out")]}],
-  dose:[["Day B","2 × 10 · after jump unlock"]],focus:["Short ground contact","Small and quiet"],stop:"Loud landings or pain"});}
+ /* pogo hops: on the balls of the feet, stiff ankles, knees soft, a few centimetres high */
+ {const x=178,pg_=(fp,lift,a)=>{const[ax,ay]=toeAnkle(x+23,fp,FY-lift);return stance({x:ax,ay,fp,dx:-2,s:4,q:6,arms:[{a:[a,a+18]},{a:[a,a+18]}]})};
+  const pg=pg_(62,0,10),pp=pg_(50,0,7),pa=pg_(46,9,5);
+  X({id:"pogo",track:"none",name:"Pogo hops",group:"mob",when:"Phase 3 · Day B",zones:["calves"],
+   clips:[{name:"Small hops",poses:{pg,pp,pa},start:"pg",ph:[
+    ph("pp",.12,"Push","steady","Stiff ankles, push off","calves:1","out"),ph("pa",.14,"Air","steady","Small hop","calves:.3","out"),
+    ph("pp",.12,"Land","steady","Land quietly","calves:.9","in"),ph("pg",.1,"Bounce","steady","Bounce right back","calves:1","out")]}],
+   dose:[["Day B","2 × 10 · after jump unlock"]],focus:["Short ground contact","Small and quiet"],stop:"Loud landings or pain"});}}
+
+/* ---------- warm-up moves ---------- */
+/* bodyweight squat: hips back and down to parallel, chest up, arms forward for balance, heels down */
+{const x=178,st=stance({x,arms:[{a:[6,6]},{a:[6,6]}]}),bot=stance({x,s:30,q:96,tr:42,head:16,arms:[{a:[86,86]},{a:[86,86]}]});
+ const cst=stance({x,arms:[{a:[6,6]},{a:[6,6]}]}),cbot=stance({x,s:24,q:80,tr:38,head:14,arms:[{a:[80,80]},{a:[80,80]}]});
+ const chair=`<rect x="108" y="206" width="44" height="7" rx="3" class="s-pad"/><rect x="110" y="213" width="5" height="45" class="s-eq"/><rect x="144" y="213" width="5" height="45" class="s-eq"/><rect x="108" y="150" width="6" height="58" rx="2" class="s-eq"/>`;
+ const P4=(l,c)=>[ph("bot",2,"Sit back","in",c,"quads:.7,glutes:.7,abs:.4"),ph("bot",.3,"Bottom","brace",l,"quads:.9,glutes:.9,abs:.5"),
+   ph("st",1,"Stand","out","Push the floor away","quads:1,glutes:1","out"),ph("st",.5,"Top","in","Squeeze glutes","glutes:.5")];
+ X({id:"bwsquat",views:["side","front"],lat:{hip:11,sh:19,knee:14,ankle:13,toe:17,elbow:21,hand:14},track:"H",name:"Bodyweight squat",group:"prep",when:"Warm-up · desk breaks",zones:["quads","glutes","abs"],
+  clips:[{name:"Standard",poses:{st,bot},start:"st",ph:P4("Thighs parallel, heels down","Hips back and down")},
+   {name:"To a chair",poses:{st:cst,bot:cbot},start:"st",ph:P4("Tap the seat, don't sit","Reach the hips back to the chair"),scene:chair,solids:[[108,206,152,213]]}],
+  dose:[["Warm-up","8 slow reps"],["Desk break","10 reps"],["After meals","2 × 10"]],focus:["Knees track over the toes","Chest up, heels down"],stop:"Knee pain"});}
+
+/* hip hinge drill: hands on hips, soft knees, push the hips back until the hamstrings stretch with a flat back */
+{const x=178,hh=p=>{const h=add(add(p.hip,U(p.tor),15),U(p.tor+90),-6);return arms(p,{t:add(h,[-2,0])},{t:h})};
+ const st=hh(stance({x})),hg=hh(stance({x,s:6,q:26,tr:62,head:8}));
+ X({id:"hinge",track:"H",name:"Hip hinge drill",group:"prep",when:"Warm-up",zones:["hams","hams~","glutes","erect"],
+  clips:[{name:"Hands on hips",poses:{st,hg},start:"st",ph:[
+   ph("hg",2,"Hinge","in","Hips back, flat back, soft knees","hams~:.8,erect:.5"),ph("hg",.5,"Feel it","brace","Stretch in the hamstrings","hams~:1,erect:.6"),
+   ph("st",1,"Stand","out","Drive the hips forward","glutes:1,hams:.8","out"),ph("st",.5,"Squeeze","in","Stand tall","glutes:.6")]}],
+  dose:[["Warm-up","8 reps"]],focus:["Hips move back, not down","Back stays flat"],stop:"Low-back pain"});}
+
+/* band pull-apart, front view: straight arms at shoulder height, pull the band to the chest by moving the arms out to a T */
+{const b={front:1,hip:[180,AY-95.6],hw:10,sw:21,legs:[{a:[-2,-2],fp:-90,fl:.5},{a:[2,2],fp:90,fl:.5}]},sy=AY-95.6-L.to;
+ const fw=P(Object.assign({},b,{arms:[{t:[174,sy+6],s:[.3,.3],k:-1},{t:[186,sy+6],s:[.3,.3],k:1}]}));
+ const T=P(Object.assign({},b,{arms:[{t:[159-72.4,sy+3],k:-1},{t:[201+72.4,sy+3],k:1}]}));
+ X({id:"pullapart",name:"Band pull-apart",group:"prep",labels:"top",when:"Warm-up",zones:["rdelt","upback"],props:[{type:"bandH"}],
+  clips:[{name:"Front view",poses:{fw,T},start:"fw",ph:[
+   ph("T",1,"Pull","out","Arms straight, band to the chest","rdelt:1,upback:1","out"),ph("T",.6,"Squeeze","hold","Squeeze shoulder blades","rdelt:1,upback:1"),
+   ph("fw",1.5,"Return","in","Control it back","rdelt:.6,upback:.6")]}],
+  dose:[["Warm-up","12 reps · light band"]],focus:["Arms stay straight","Shoulders down"],stop:"Shoulder pinch"});}
+
+/* ---------- cool-down stretches ---------- */
+/* half-kneeling hip-flexor stretch: tuck the pelvis, shift forward, then reach the same-side arm up */
+{const K=[150,250],hk=(al,tr,arm)=>{const hip=[K[0]+L.th*sn(al),K[1]-L.th*cs(al)];
+   return P({hip,tor:180-tr,legs:[{t:[hip[0]+48,AY],fp:90},{a:[-al,-90],fp:-90}],arms:[{a:[6,6]},arm]})};
+ const set=hk(0,0,{a:[6,6]}),shift=hk(20,-2,{a:[6,6]}),reach=hk(20,-4,{a:[172,174]});
+ X({id:"hipflex",name:"Hip-flexor stretch",group:"prep",track:"H",when:"Cool-down",zones:["hipflex@1~","quads@1~","glutes@1"],
+  clips:[{name:"Half-kneeling",poses:{set,shift,reach},start:"set",ph:[
+   ph("set",1,"Tuck","in","Squeeze the back-leg glute, tuck the pelvis","glutes@1:.8"),
+   ph("shift",1.5,"Shift","out","Shift hips forward a little","hipflex@1~:1,quads@1~:.6,glutes@1:.7"),
+   ph("reach",1.2,"Reach","in","Same-side arm up","hipflex@1~:1,quads@1~:.6"),
+   ph("reach",4,"Hold","steady","Breathe; hold 30 s each side","hipflex@1~:1,quads@1~:.6"),
+   ph("set",1.5,"Return","out","Ease back",{})]}],
+  dose:[["Cool-down","30 s each side"]],focus:["Pelvis tucked, not arched","Small shift is enough"],stop:"Knee pain on the floor; use a cushion"});}
+
+/* lying hamstring stretch: one leg flat, the other straight up, hands behind the thigh */
+{const hip=[130,FY-11],S=add(hip,U(90),L.to);
+ const hs=(a,fp,hd)=>{const p=P({hip,tor:90,flip:1,legs:[{a:[-90,-90],fp:180,fl:.9},{a:[a,a],fp,fl:.9}]});p.arms=[limb({t:hd,k:-1},1),limb({t:add(hd,[2,0]),k:-1},1)];return p};
+ const rest=hs(-90,180,[S[0]-72.4,FY-11]),up=hs(-170,100,add(hip,U(-170),33.5));
+ X({id:"hamstretch",name:"Hamstring stretch",group:"prep",track:"none",when:"Cool-down",zones:["hams@1~","calves@1~"],
+  clips:[{name:"Lying",poses:{rest,up},start:"rest",ph:[
+   ph("up",2,"Lift","out","Straight leg up, hands behind the thigh","hams@1~:.8"),
+   ph("up",4,"Hold","steady","Gentle stretch; hold 30 s each side","hams@1~:1,calves@1~:.4"),
+   ph("rest",2,"Lower","in","Lower slowly",{}),ph("rest",.6,"Rest","steady","",{})]}],
+  dose:[["Cool-down","30 s each side"]],focus:["Knee straight but not locked","Other leg flat"],stop:"Tingling down the leg"});}
+
+/* child's pose: sit back on the heels, arms long on the floor, forehead down */
+{const K=[200,250],kl={a:[0,-90],fp:-90},tall=(()=>{const p=P({hip:[200,202],tor:180,legs:[{a:[0,-90],fp:-90},kl]}),S=S_OF(p);return arms(p,{t:[S[0]+4,S[1]-72.3]},{t:[S[0]+6,S[1]-72.3]})})();
+ const ch=(()=>{const a0=63.4,hip=add(K,U(a0),-L.th),p=P({hip,tor:80,head:-10,legs:[{a:[a0,-90],fp:-90},{a:[a0,-90],fp:-90}]});return arms(p,{t:[283,FY-4.5]},{t:[286,FY-4.5]})})();
+ X({id:"childpose",name:"Child's pose",group:"prep",track:"none",when:"Cool-down",zones:["lats~","erect~","glutes~"],
+  clips:[{name:"Kneeling",poses:{tall,ch},start:"tall",ph:[
+   ph("ch",2.5,"Sit back","out","Hips to heels, arms long","lats~:.7,erect~:.6"),
+   ph("ch",6,"Hold","steady","Slow breaths; hold 45 s","lats~:1,erect~:.9,glutes~:.6"),
+   ph("tall",2,"Rise","in","Roll up slowly",{}),ph("tall",.5,"Reset","steady","",{})]}],
+  dose:[["Cool-down","45 s"]],focus:["Let the hips sink","Breathe into the back"],stop:"Knee pain; put a cushion behind the knees"});}
+
+/* wall calf stretch: back leg straight with the heel down, lean the hips toward the wall */
+{const wall=248,BA=[128,AY],FA=[190,AY];
+ const cs_=(phi,tr)=>{const hip=add(BA,U(180-phi),95.7),p=P({hip,tor:180-tr,legs:[{t:BA,fp:90},{t:FA,fp:90}]}),S=S_OF(p);return arms(p,{t:[wall-3,S[1]+4]},{t:[wall-3,S[1]+6]})};
+ const a0=cs_(20,16),a1=cs_(30,24);
+ X({id:"calfstretch",name:"Wall calf stretch",group:"prep",track:"H",when:"Cool-down",zones:["calves@0~"],scene:SC.wall(wall),
+  clips:[{name:"Straight knee",poses:{a0,a1},start:"a0",ph:[
+   ph("a1",1.5,"Lean","out","Back heel down, lean in","calves@0~:1"),ph("a1",4,"Hold","steady","Hold 30 s each side","calves@0~:1"),
+   ph("a0",1.5,"Ease off","in","Back off a little",{})]}],
+  dose:[["Cool-down","30 s each side"]],focus:["Back heel stays down","Back knee straight"],stop:"Achilles pain"});}
 
 
 /* ================= APP ================= */
@@ -1177,21 +1342,31 @@ function dayType(dow,w,ph){
 }
 const TRAIN=t=>["F","A","B","C","ACC"].includes(t);
 const TITLE={F:"Full-body day",A:"Strength day",B:"Power day",C:"Volume day",ACC:"Accessory day",SAT:"Rest day",REST:"Rest day",PRE:"EasyBody"};
-const CARDIO={P1:"Bike 6 min → stairs 2 → walk 2",C1:"Bike 3 easy + 11 → stairs 5 → walk 3",P2:"Bike 9 min → stairs 5 → walk 2",
-  I8:"Bike 3 easy, 8 × (30 s hard, 60 s easy), 2 easy → stairs 8 → walk 3",P3:"Bike 10 min → stairs 6 → walk 2",
-  I10:"Bike 3 easy, 10 × (30 s hard, 60 s easy), 2 easy → stairs 10 → walk 3",S15:"15 min easy bike, or 3 short stair climbs"};
+const CARDIO={P1:"Bike 6 min → stairs 2 → easy bike 2",C1:"Bike 3 easy + 11 → stairs 5 → easy bike 3",P2:"Bike 9 min → stairs 5 → easy bike 2",
+  I8:"Bike 3 easy, 8 × (30 s hard, 60 s easy), 2 easy → stairs 8 → easy bike 3",P3:"Bike 10 min → stairs 6 → easy bike 2",
+  I10:"Bike 3 easy, 10 × (30 s hard, 60 s easy), 2 easy → stairs 10 → easy bike 3",S15:"15 min easy bike, or 3 short stair climbs"};
 const CMIN={P1:10,C1:22,P2:16,I8:28,P3:18,I10:33,S15:15};
 const FLOW=[["wgs","5 each side"],["ninety","8 each side"],["openbook","8 each side"],["squathold","60 s total"],["bander","2 × 15 each side"],["yraise","2 × 10"],["tib","2 × 15"],["shortfoot","2 × 5 holds of 5 s"]];
-/* quality-of-life routines: [exercise id or null, step, dose] */
+/* warm-up (raise, mobilise, activate, then ramp-up sets on the first lift for each muscle group): [exercise, dose, clip] */
+const WARM={lift:[["bwsquat","8 slow reps"],["hinge","8 reps"],["wgs","3 each side"],["pullapart","12 reps, light band"]],
+  acc:[["bwsquat","8 slow reps"],["bss","5 each side, no weight",1],["hinge","8 reps"],["pullapart","12 reps, light band"]]};
+const COOL=[["hipflex","30 s each side"],["hamstretch","30 s each side"],["childpose","45 s"],["calfstretch","30 s each side"]];
+const WHY_WARM="Warming up improved performance in about 4 of 5 measures across studies (Fradkin 2010 meta-analysis). A warm-up before hard lowering work slightly reduced next-day soreness (Law & Herbert 2007). Structured movement warm-ups cut injuries by about a third in team sports (Thorborg 2017); that is sport, not lifting, so treat it as indirect. One or two light ramp-up sets on the first lift for each muscle group are enough (Iversen 2021). Skip long static stretches here; under 60 s per muscle does no harm (Behm 2016).";
+const WHY_COOL="Honest note: a cool-down does not prevent soreness or injury, or speed up recovery (Van Hooren & Peake 2018). Stretching afterwards cuts soreness by a trivial amount (Herbert 2011 Cochrane review). Do it because it feels good and brings your heart rate down gently; regular stretching does improve range of motion over weeks (Behm 2016). What really limits soreness is building up slowly, which your RIR 3 start already does.";
+const warmUp=acc=>({title:"Warm-up",prep:true,hint:"About 6 min. Ramp-up sets are marked on the first lift for each muscle group.",why:WHY_WARM,
+  items:[I("wu_bike",null,"Easy bike",{rx:"3 min · easy, 3–4/10 effort"}),I("wu_moves",null,"Warm-up moves",{rx:"About 3 min · 4 moves",sub:acc?WARM.acc:WARM.lift})]});
+const coolDown=bike=>({title:"Cool-down",prep:true,hint:"About 4 min, for comfort.",why:WHY_COOL,
+  items:[...(bike?[I("cd_bike",null,"Easy bike",{rx:"2–3 min · very easy"})]:[]),I("cd_moves",null,"Stretches",{rx:"About 3 min · 4 stretches",sub:COOL}),I("cd_breath",null,"Slow breathing",{rx:"1 min · in 4 s, out 6 s, through the nose"})]});
+/* quality-of-life routines: [exercise id or null, step, dose, clip] */
 const ROUT=[
   {k:"am",n:"Morning",ic:"sun",dur:"10 min",win:[0,180],why:"Morning light sets your body clock, so you get sleepy on time at night. A regular wake time is a core part of CBT-I, the standard non-drug insomnia treatment.",
     steps:[[null,"Daylight","10 min outside or at an open window within an hour of waking. Sitting with your coffee counts."],[null,"Same wake time","Every day, weekends included"]]},
   {k:"desk",n:"Desk breaks",ic:"desk",dur:"2 min",why:"Breaking up sitting with short bodyweight moves (half-squats, calf raises) lowered blood sugar and insulin through the day (Dempsey 2016). Seated heel raises kept leg muscles burning sugar while sitting (Hamilton 2022).",
-    steps:[[null,"Bodyweight squats","10, standing up from your chair"],["calf","Calf raises","15"],[null,"Can't stand up?","Seated heel raises for 2 min: balls of your feet down, lift your heels"]]},
+    steps:[["bwsquat","Bodyweight squats","10, standing up from your chair",1],["calf","Calf raises","15"],[null,"Can't stand up?","Seated heel raises for 2 min: balls of your feet down, lift your heels"]]},
   {k:"lunch",n:"After lunch",ic:"bolt",dur:"3 min",win:[0,120],why:"Working your leg muscles soon after eating pulls sugar out of the blood. Resistance exercise after a meal lowers the rise (Heden 2015), and short squat and calf-raise bouts helped too (Dempsey 2016). Caffeine within about 9 h of bed cuts sleep (Gardiner 2023).",
-    steps:[[null,"Bodyweight squats","2 × 10, within 30 min of eating"],["calf","Calf raises","2 × 15"],[null,"Last caffeine",()=>`By ${fmtM(toMin(S.rt.pm.t)-540)}, about 9 h before bed`]]},
+    steps:[["bwsquat","Bodyweight squats","2 × 10, within 30 min of eating"],["calf","Calf raises","2 × 15"],[null,"Last caffeine",()=>`By ${fmtM(toMin(S.rt.pm.t)-540)}, about 9 h before bed`]]},
   {k:"dinner",n:"After dinner",ic:"bolt",dur:"3 min",win:[0,150],why:"Working your leg muscles soon after eating pulls sugar out of the blood. Resistance exercise after a meal lowers the rise (Heden 2015), and short squat and calf-raise bouts helped too (Dempsey 2016).",
-    steps:[[null,"Bodyweight squats","2 × 10, within 30 min of eating"],["calf","Calf raises","2 × 15"],[null,"Watching TV?","Seated heel raises work too, 5 min or more"]]},
+    steps:[["bwsquat","Bodyweight squats","2 × 10, within 30 min of eating"],["calf","Calf raises","2 × 15"],[null,"Watching TV?","Seated heel raises work too, 5 min or more"]]},
   {k:"pm",n:"Wind-down",ic:"moon",dur:"30 min",off:-30,win:[0,90],why:"Bright evening light delays melatonin. Relaxation training is part of CBT-I and helps you fall asleep.",
     steps:[[null,"Dim the lights","Screens away, lamps low"],[null,"Slow breathing","5 min · in 4 s, out 6 s, through the nose"],[null,"Same bedtime","Lights out at your set time"]]}];
 const toMin=t=>{const[h,m]=String(t||"0:0").split(":").map(Number);return h*60+(m||0)};
@@ -1206,7 +1381,7 @@ const exById=id=>EX.find(e=>e.id===id);
 const exName=id=>(exById(id)||{}).name||id;
 /* item: sets [min,max] + reps → tap-per-set; otherwise a single Done tap */
 function I(key,ex,name,o){const it=Object.assign({key,ex,name:name||exName(ex),clip:0,w:false},o);
-  if(it.sets&&!it.rx){const[a,b]=it.sets;it.rx=[`${a===b?a:a+"–"+b} × ${it.reps}`,it.rir,it.rest&&"rest "+fmtRest(it.rest),it.note].filter(Boolean).join(" · ")}
+  if(it.sets&&!it.rx){const[a,b]=it.sets;it.rx=[`${a===b?a:a+"–"+b} × ${it.reps}`,it.rir,it.rest&&"rest "+fmtRest(it.rest),it.note,it.ramp&&`ramp: ${it.ramp} first`].filter(Boolean).join(" · ")}
   return it}
 function plan(d){
   if(!S.start||d<S.start)return{type:"PRE",week:0,phase:0,sections:[]};
@@ -1220,46 +1395,47 @@ function plan(d){
     }
     it.push(I("landmine","landmine",null,{sets:[3,3],reps:"5 each side",rest:60,note:type==="F"&&w<=2?"slow, learn the arc":"fast",w:true}));
     if(type==="F"){
-      it.push(I("deadlift","deadlift",null,{sets:[2,3],reps:"6–8",rir:"RIR 3–4",rest:120,note:"high handles",w:true}));
-      it.push(I("pullup","pullup","Pulldown or assisted pull-up",{sets:[2,3],reps:"8–10",rir:"RIR 3",rest:90,w:true}));
-      it.push(I("pushup","pushup",null,{sets:[2,3],reps:"8–12",rir:"RIR 3",rest:90}));
-      it.push(I("press","press","Half-kneeling DB press",{sets:[2,3],reps:"8–10 each side",rir:"RIR 3",rest:75,clip:1,w:true}));
+      it.push(I("deadlift","deadlift",null,{sets:[2,3],reps:"6–8",rir:"RIR 3–4",rest:120,note:"high handles",ramp:"2 light sets",w:true}));
+      it.push(I("pullup","pullup","Pulldown or assisted pull-up",{sets:[2,3],reps:"8–10",rir:"RIR 3",rest:90,ramp:"1 easy set",w:true}));
+      it.push(I("pushup","pushup",null,{sets:[2,3],reps:"8–12",rir:"RIR 3",rest:90,ramp:"5 incline reps"}));
+      it.push(I("press","press","Half-kneeling DB press",{sets:[2,3],reps:"8–10 each side",rir:"RIR 3",rest:75,clip:1,ramp:"1 light set",w:true}));
       it.push(w<=2?I("swing","swing",w===1?"Kettlebell deadlift":"Kettlebell hike pass",{sets:[3,3],reps:w===1?"8":"5",rest:60,w:true})
         :I("swing","swing",null,{rx:"5–8 rounds · 20–30 s on, 30–40 s off",w:true}));
     }else if(type==="A"){
-      it.push(I("deadlift","deadlift",null,{sets:[3,4],reps:"4–6",rir:"RIR 2–3",rest:150,w:true}));
-      it.push(I("pullup","pullup",null,{sets:up,reps:"5–8",rir:"RIR 2–3",rest:90,w:true}));
-      it.push(I("pushup","pushup",null,{sets:up,reps:"6–10",rir:"RIR 2–3",rest:90}));
-      it.push(I("press","press","Standing DB press",{sets:up,reps:"6–8",rir:"RIR 2–3",rest:120,w:true}));
+      it.push(I("deadlift","deadlift",null,{sets:[3,4],reps:"4–6",rir:"RIR 2–3",rest:150,ramp:"2 light sets",w:true}));
+      it.push(I("pullup","pullup",null,{sets:up,reps:"5–8",rir:"RIR 2–3",rest:90,ramp:"1 easy set",w:true}));
+      it.push(I("pushup","pushup",null,{sets:up,reps:"6–10",rir:"RIR 2–3",rest:90,ramp:"5 incline reps"}));
+      it.push(I("press","press","Standing DB press",{sets:up,reps:"6–8",rir:"RIR 2–3",rest:120,ramp:"1 light set",w:true}));
       it.push(I("swing","swing",null,{rx:"10–12 rounds · 30 s on, 30 s off",w:true}));
     }else if(type==="C"){
-      it.push(I("deadlift","deadlift",null,{sets:[2,3],reps:"8–10",rir:"RIR 2",rest:120,w:true}));
-      it.push(I("pushup","pushup",null,{sets:up,reps:"10–20",rir:"RIR 1–2",rest:90}));
-      it.push(I("pullup","pullup",null,{sets:up,reps:"8–12",rir:"RIR 1–2",rest:90,w:true}));
-      it.push(I("press","press","Standing DB press",{sets:up,reps:"10–12",rir:"RIR 1–2",rest:90,w:true}));
+      it.push(I("deadlift","deadlift",null,{sets:[2,3],reps:"8–10",rir:"RIR 2",rest:120,ramp:"2 light sets",w:true}));
+      it.push(I("pushup","pushup",null,{sets:up,reps:"10–20",rir:"RIR 1–2",rest:90,ramp:"5 incline reps"}));
+      it.push(I("pullup","pullup",null,{sets:up,reps:"8–12",rir:"RIR 1–2",rest:90,ramp:"1 easy set",w:true}));
+      it.push(I("press","press","Standing DB press",{sets:up,reps:"10–12",rir:"RIR 1–2",rest:90,ramp:"1 light set",w:true}));
     }else{
-      it.push(I("swing","swing","Heavy kettlebell swing",{sets:[6,8],reps:"5",rest:50,w:true}));
-      it.push(I("press","press","DB push press",{sets:[4,4],reps:"3–5",rir:"RIR 3+",rest:90,clip:2,w:true}));
+      it.push(I("swing","swing","Heavy kettlebell swing",{sets:[6,8],reps:"5",rest:50,ramp:"1 light set",w:true}));
+      it.push(I("press","press","DB push press",{sets:[4,4],reps:"3–5",rir:"RIR 3+",rest:90,clip:2,ramp:"1 light set",w:true}));
       it.push(I("pushup","pushup",S.jumps?"Plyo push-up":"Fast push-up",{sets:[3,3],reps:"3–5",rest:60,note:"explosive",clip:S.jumps?1:0}));
-      it.push(I("pullup","pullup","Fast pull-up",{sets:[3,3],reps:"3–5",rest:75}));
+      it.push(I("pullup","pullup","Fast pull-up",{sets:[3,3],reps:"3–5",rest:75,ramp:"1 easy set"}));
     }
     if(type!=="B"){
       it.push(I("chop","chop",null,{sets:early?[2,2]:[3,3],reps:"8–10 each side",rir:early?"RIR 3":"RIR 2–3",rest:60,clip:(w+dow)%2,w:true}));
       it.push(I("neck","neck","4-way neck",early?{sets:[2,2],reps:"10 s each way",rest:30,note:"push against your hand, ~50%"}:{sets:[3,3],reps:"15–25 each way",rest:45}));
     }
-    sec.push({title:"Workout",hint:"Warm up with 4 min easy bike and the mobility flow.",items:it});
+    sec.push(warmUp(false),{title:"Workout",items:it});
     if(type!=="B"){const c=ph===1?"P1":ph===2?"P2":"P3";sec.push({title:"Cardio",items:[I("cardio",null,`${CMIN[c]} min after lifting`,{rx:CARDIO[c]+" · 5–6/10 effort",min:CMIN[c]})]})}
+    sec.push(coolDown(type==="B"));
   }else if(type==="ACC"){
-    sec.push({title:"Workout",hint:"Warm up with 4 min easy bike and the mobility flow.",items:[
-      I("bss","bss",early?"Split squat":null,{sets:[n,n],reps:"8–12 each side",rir,rest:75,clip:early?1:0,w:true}),
-      I("legcurl","legcurl",null,{sets:[n,n],reps:"8–12",rir,rest:75,w:true}),
-      I("row","row",null,{sets:[n,n],reps:"8–12",rir,rest:75,w:true}),
+    sec.push(warmUp(true),{title:"Workout",items:[
+      I("bss","bss",early?"Split squat":null,{sets:[n,n],reps:"8–12 each side",rir,rest:75,clip:early?1:0,ramp:"1 light set",w:true}),
+      I("legcurl","legcurl",null,{sets:[n,n],reps:"8–12",rir,rest:75,ramp:"1 light set",w:true}),
+      I("row","row",null,{sets:[n,n],reps:"8–12",rir,rest:75,ramp:"1 light set",w:true}),
       I("latraise","latraise",null,{sets:[n,n],reps:"12–20",rest:60,w:true}),
       I("calf","calf",null,{sets:[n,n],reps:"10–15",rest:60,note:early?"pause 2 s at the bottom":"every 2nd set bent-knee",w:true}),
       I("hangraise","hangraise",early?"Hanging knee raise":null,{sets:[n,n],reps:"8–12",rest:60,clip:w>=9?1:0}),
       I("sideplank","sideplank",null,{sets:[n,n],reps:"20–40 s each side",rest:30,note:"5–10 leg raises"}),
       I("copenhagen","copenhagen",null,{sets:[n,n],reps:"15–30 s each side",rest:30,note:w>=9?"long lever if 30 s is easy":"knee on bench"})]});
-    const c=ph===1?"C1":ph===2?"I8":"I10";sec.push({title:"Cardio",items:[I("cardio",null,`${CMIN[c]} min after strength`,{rx:CARDIO[c],min:CMIN[c]})]});
+    const c=ph===1?"C1":ph===2?"I8":"I10";sec.push({title:"Cardio",items:[I("cardio",null,`${CMIN[c]} min after strength`,{rx:CARDIO[c],min:CMIN[c]})]},coolDown(false));
   }else if(type==="SAT"&&ph>=2){
     sec.push({title:"Optional",items:[I("cardio",null,"15 min easy cardio",{rx:CARDIO.S15,opt:true})]});
   }
@@ -1273,7 +1449,7 @@ function plan(d){
 }
 const allItems=P=>P.sections.flatMap(s=>s.items);
 const isDone=(i,R)=>i.sets?(R.sets[i.key]||0)>=i.sets[0]:i.count?(R.desk||0)>=i.count:!!R.done[i.key];
-const workItems=P=>P.sections.filter(s=>!s.daily).flatMap(s=>s.items).filter(i=>!i.opt&&!i.locked);
+const workItems=P=>P.sections.filter(s=>!s.daily&&!s.prep).flatMap(s=>s.items).filter(i=>!i.opt&&!i.locked);
 /* day status: training days count the workout + cardio; weekends never break a streak */
 function status(d){
   if(!S.start||d<S.start)return"pre";if(d>todayStr())return"future";
@@ -1342,7 +1518,7 @@ const IC={check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
   right:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>'};
 
 /* ---------- today ---------- */
-let sel=todayStr(),editW=null,openFlow=false;
+let sel=todayStr(),editW=null,openSub={},openWhy={};
 function rowHTML(i,R,d){
   const dn=isDone(i,R),how=i.ex?`<button class="hbtn" data-act="how" data-ex="${i.ex}" data-clip="${i.clip}" data-rx="${esc(i.rx)}" aria-label="How to do ${esc(i.name)}">${IC.play}</button>`:"";
   const L=i.w?lastW(i.key,d):null,wv=R.w[i.key];
@@ -1352,9 +1528,9 @@ function rowHTML(i,R,d){
   if(!i.locked){
     if(i.sets){const k=R.sets[i.key]||0;h+=`<div class="sets">`;for(let s=1;s<=i.sets[1];s++)h+=`<button class="set${s<=k?" on":""}${s>i.sets[0]?" opt":""}" data-act="set" data-n="${s}" aria-label="Set ${s}${s<=k?" done":""}">${s<=k?IC.check.replace("<svg",'<svg width="18" height="18"'):s}</button>`;
       h+=`${L&&!wv?`<span class="lastv">last time<br>${fmtShort(L.d)}</span>`:""}</div>`}
-    else h+=`<div class="sets"><button class="donebtn" data-act="toggle">${IC.check}${dn?"Done":"Mark done"}</button>${i.sub?`<button class="linkbtn" data-act="flow" style="margin-left:auto">${openFlow?"Hide moves":"Show moves"}</button>`:""}</div>`;
+    else h+=`<div class="sets"><button class="donebtn" data-act="toggle">${IC.check}${dn?"Done":"Mark done"}</button>${i.sub?`<button class="linkbtn" data-act="flow" style="margin-left:auto">${openSub[i.key]?"Hide moves":"Show moves"}</button>`:""}</div>`;
   }
-  if(i.sub&&openFlow)h+=`<div class="sub">${i.sub.map(([id,rx])=>`<div class="subrow"><div><b>${esc(exName(id))}</b><span>${esc(rx)}</span></div><button class="hbtn" data-act="how" data-ex="${id}" data-clip="0" data-rx="${esc(rx)}" aria-label="How to do ${esc(exName(id))}">${IC.play}</button></div>`).join("")}</div>`;
+  if(i.sub&&openSub[i.key])h+=`<div class="sub">${i.sub.map(([id,rx,clip])=>`<div class="subrow"><div><b>${esc(exName(id))}</b><span>${esc(rx)}</span></div><button class="hbtn" data-act="how" data-ex="${id}" data-clip="${clip||0}" data-rx="${esc(rx)}" aria-label="How to do ${esc(exName(id))}">${IC.play}</button></div>`).join("")}</div>`;
   return h+`</div>`;
 }
 let openRt=null;
@@ -1370,7 +1546,7 @@ function routineRow(i,R,d,due){
   if(r.k==="desk"){const k=R.desk||0;
     h+=`<div class="pips">${Array.from({length:i.count},(_,j)=>`<i class="${j<k?"on":""}"></i>`).join("")}</div><div class="deskc"><button class="donebtn" data-act="desk">${IC.plus}Log break</button>${k?`<button class="rminus" data-act="deskm" aria-label="Remove a break">−</button>`:""}<span class="lastv">${k}/${i.count} breaks${R.deskT&&d===todayStr()?`<br>last ${new Date(R.deskT).toTimeString().slice(0,5)}`:""}</span></div>`}
   else h+=`<div class="sets"><button class="donebtn" data-act="toggle">${IC.check}${dn?"Done":"Mark done"}</button></div>`;
-  if(open)h+=`<div class="steps">${r.steps.map(([id,n,x])=>{const rx=stepRx(x);return`<div class="subrow"><div><b>${esc(n)}</b><span>${esc(rx)}</span></div>${id?`<button class="hbtn" data-act="how" data-ex="${id}" data-clip="0" data-rx="${esc(rx)}" aria-label="How to do ${esc(n)}">${IC.play}</button>`:""}</div>`}).join("")}<p class="why"><b>Why</b>${esc(r.why)}</p></div>`;
+  if(open)h+=`<div class="steps">${r.steps.map(([id,n,x,clip])=>{const rx=stepRx(x);return`<div class="subrow"><div><b>${esc(n)}</b><span>${esc(rx)}</span></div>${id?`<button class="hbtn" data-act="how" data-ex="${id}" data-clip="${clip||0}" data-rx="${esc(rx)}" aria-label="How to do ${esc(n)}">${IC.play}</button>`:""}</div>`}).join("")}<p class="why"><b>Why</b>${esc(r.why)}</p></div>`;
   return h+`</div>`;
 }
 let ringAnim=true;
@@ -1382,7 +1558,7 @@ function renderToday(){
   for(let i=0;i<7;i++){const x=addDays(m,i),st=status(x),dd=parse(x),mx=metrics(x);
     days+=`<button class="day ${st}${x===t?" today":""}" data-date="${x}"${x===d?' aria-current="date"':""} aria-label="${fmtLong(x)}"><span class="w">${WD[dd.getDay()][0]}</span>${ringSVG([frac(mx.w),frac(mx.c),frac(mx.d)],anim)}</button>`}
   let h=`<div class="strip"><button class="nav" data-shift="-7" aria-label="Previous week">${IC.left}</button><div class="days">${days}</div><button class="nav" data-shift="7" aria-label="Next week">${IC.right}</button></div>`;
-  if(P.type==="PRE"){h+=`<div class="card empty"><b>Starts ${fmtLong(S.start)}</b>Learn the moves in Exercises before day one.</div>`;$("tab-today").innerHTML=h;return}
+  if(P.type==="PRE"){h+=`<div class="card empty"><b>${S.start?`Starts ${fmtLong(S.start)}`:"Set a start date"}</b>Learn the moves in Exercises before day one.</div>`;$("tab-today").innerHTML=h;return}
   const req=workItems(P),dn=req.filter(i=>isDone(i,R)).length,full=req.length&&dn===req.length,due=d===t?dueRoutine(P,R):null;
   if(due)h+=`<div class="card nowc" style="--rc:var(--r3)" data-key="${due.key}"><span class="rti">${IC[due.rt.icon||due.rt.ic]}</span><button class="t" data-act="rtgo"><small>NOW</small><b>${esc(due.name)}</b><span>${esc(due.rt.steps.map(x=>x[1]).join(" · "))}</span></button><button class="pill" data-act="${due.rt.k==="desk"?"desk":"toggle"}">${due.rt.k==="desk"?"Log":"Done"}</button></div>`;
   const stat=(n,c,x,u)=>`<div><dt>${n}</dt><dd style="color:var(${c})">${x?`${x.a}/${x.b}<small>${u}</small>`:`<span class="rest">Rest</span>`}</dd></div>`;
@@ -1392,8 +1568,9 @@ function renderToday(){
   P.sections.forEach(s=>{
     const c=s.items.filter(i=>!i.locked&&isDone(i,R)).length,tot=s.items.filter(i=>!i.locked&&!i.opt).length;
     h+=`<div class="sec"><h3>${esc(s.title)}</h3><span>${Math.min(c,tot)}/${tot}</span></div>`;
-    if(s.hint)h+=`<p class="hint">${esc(s.hint)}</p>`;
-    h+=`<div class="card" style="--rc:var(${s.daily?"--r3":s.title==="Workout"?"--r1":"--r2"})">${s.items.map(i=>s.routines?routineRow(i,R,d,due):rowHTML(i,R,d)).join("")}</div>`;
+    if(s.hint)h+=`<p class="hint">${esc(s.hint)}${s.why?` <button class="linkbtn" data-act="why" data-sec="${esc(s.title)}">${openWhy[s.title]?"Hide":"Why?"}</button>`:""}</p>`;
+    if(s.why&&openWhy[s.title])h+=`<p class="why secwhy"><b>Research</b>${esc(s.why)}</p>`;
+    h+=`<div class="card" style="--rc:var(${s.daily?"--r3":s.title==="Workout"||s.prep?"--r1":"--r2"})">${s.items.map(i=>s.routines?routineRow(i,R,d,due):rowHTML(i,R,d)).join("")}</div>`;
   });
   $("tab-today").innerHTML=h;
   const wi=$("winput");if(wi){wi.focus({preventScroll:true});wi.select()}
@@ -1411,7 +1588,8 @@ $("tab-today").addEventListener("click",e=>{
   if(b.dataset.shift){sel=addDays(sel,+b.dataset.shift);editW=null;ringAnim=true;renderToday();return}
   const a=b.dataset.act,ex=b.closest("[data-key]"),key=ex&&ex.dataset.key,it=key&&findItem(key);
   if(a==="how"){openPlayer(b.dataset.ex,+b.dataset.clip||0,b.dataset.rx);return}
-  if(a==="flow"){openFlow=!openFlow;renderToday();return}
+  if(a==="flow"){openSub[key]=!openSub[key];renderToday();return}
+  if(a==="why"){openWhy[b.dataset.sec]=!openWhy[b.dataset.sec];renderToday();return}
   if(a==="rtx"){const open=openRt===key||(openRt===null&&ex.querySelector(".tag.now"));openRt=open?"":key;renderToday();return}
   if(a==="rtgo"){openRt=key;renderToday();const row=$("row-"+key);row&&row.scrollIntoView({behavior:"smooth",block:"center"});return}
   if(a==="w"){if(editW===key){const v=$("winput");v&&setW(key,v.value);editW=null}else editW=key;renderToday();return}
