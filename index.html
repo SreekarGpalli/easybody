@@ -139,22 +139,22 @@ input,textarea{font:inherit;color:var(--ink)}
 .secwhy{margin:-2px 4px 10px}
 .tag{font-size:11px;font-weight:600;padding:2px 7px;border-radius:6px;background:var(--card2);color:var(--muted);margin-left:6px;vertical-align:2px}
 /* rest timer: watch-style */
-.rest{position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 68px);z-index:6;display:flex;justify-content:center;padding:0 10px;pointer-events:none}
-.rest>div{pointer-events:auto;width:100%;max-width:540px;background:rgba(28,28,30,.9);backdrop-filter:blur(24px) saturate(1.6);-webkit-backdrop-filter:blur(24px) saturate(1.6);border-radius:26px;padding:10px 10px 10px 12px;display:flex;align-items:center;gap:10px;box-shadow:0 14px 40px rgba(0,0,0,.6),inset 0 0 0 .5px rgba(255,255,255,.1)}
+.restbar{position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 68px);z-index:6;display:flex;justify-content:center;padding:0 10px;pointer-events:none}
+.restbar>div{pointer-events:auto;width:100%;max-width:540px;background:rgba(28,28,30,.9);backdrop-filter:blur(24px) saturate(1.6);-webkit-backdrop-filter:blur(24px) saturate(1.6);border-radius:26px;padding:10px 10px 10px 12px;display:flex;align-items:center;gap:10px;box-shadow:0 14px 40px rgba(0,0,0,.6),inset 0 0 0 .5px rgba(255,255,255,.1)}
 .rring{width:52px;height:52px;flex:none;transform:rotate(-90deg)}
 .rring circle{fill:none;stroke-width:6;stroke-linecap:round}
 .rring .t{stroke:color-mix(in srgb,var(--volt) 20%,#000)}
 .rring .p{stroke:var(--volt);stroke-dasharray:100 100;transition:stroke-dashoffset .25s linear}
 .rtx{flex:1;min-width:0;display:flex;flex-direction:column}
-.rest .tm{font-family:var(--fr);font-size:34px;font-weight:700;color:var(--volt);font-variant-numeric:tabular-nums;line-height:1}
-.rest .lb{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:4px}
-.rest .lb b{color:var(--volt);font-weight:800;letter-spacing:.08em;font-size:10.5px;margin-right:6px}
-.rest button{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.12);font-family:var(--fr);font-weight:700;font-size:14px;display:grid;place-items:center;flex:none}
-.rest button svg{width:15px;height:15px}
-.rest.go>div{background:var(--volt);animation:pulse 1s ease-in-out infinite}
-.rest.go .tm,.rest.go .lb,.rest.go .lb b{color:#000}
-.rest.go button{background:rgba(0,0,0,.12);color:#000}
-.rest.go .rring .t{stroke:rgba(0,0,0,.15)} .rest.go .rring .p{stroke:#000}
+.restbar .tm{font-family:var(--fr);font-size:34px;font-weight:700;color:var(--volt);font-variant-numeric:tabular-nums;line-height:1}
+.restbar .lb{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:4px}
+.restbar .lb b{color:var(--volt);font-weight:800;letter-spacing:.08em;font-size:10.5px;margin-right:6px}
+.restbar button{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.12);font-family:var(--fr);font-weight:700;font-size:14px;display:grid;place-items:center;flex:none}
+.restbar button svg{width:15px;height:15px}
+.restbar.go>div{background:var(--volt);animation:pulse 1s ease-in-out infinite}
+.restbar.go .tm,.restbar.go .lb,.restbar.go .lb b{color:#000}
+.restbar.go button{background:rgba(0,0,0,.12);color:#000}
+.restbar.go .rring .t{stroke:rgba(0,0,0,.15)} .restbar.go .rring .p{stroke:#000}
 @keyframes pulse{50%{transform:scale(1.025)}}
 /* tab bar */
 .tabbar{position:fixed;left:0;right:0;bottom:0;background:rgba(22,22,22,.8);backdrop-filter:blur(24px) saturate(1.8);-webkit-backdrop-filter:blur(24px) saturate(1.8);border-top:.5px solid rgba(255,255,255,.14);padding:2px 8px calc(env(safe-area-inset-bottom,0px) + 2px);display:flex;justify-content:center;z-index:5}
@@ -316,7 +316,7 @@ textarea{width:100%;min-height:96px;background:var(--card2);border:0;border-radi
 .cl:not(.st) .cl-d{fill:var(--st-heat)}
 .rip{fill:none;stroke-width:2.2}
 .vnote{font-family:var(--fb);font-size:10.5px;font-weight:700;letter-spacing:.1em;fill:var(--st-muted)}
-@media (prefers-reduced-motion: reduce){.switch,.switch:after,.toast,.set,.donebtn,.rring .p{transition:none}.rg.anim .p,.rest.go>div,.sheet:not([hidden]) .wrap{animation:none}}
+@media (prefers-reduced-motion: reduce){.switch,.switch:after,.toast,.set,.donebtn,.rring .p{transition:none}.rg.anim .p,.restbar.go>div,.sheet:not([hidden]) .wrap{animation:none}}
 </style>
 </head>
 <body>
@@ -339,7 +339,7 @@ textarea{width:100%;min-height:96px;background:var(--card2);border:0;border-radi
   <button role="tab" data-tab="progress" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20v-6M10 20V9M15 20v-4M20 20V5"/></svg>Progress</button>
   <button role="tab" data-tab="library" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l5.5-3.5z" fill="currentColor"/></svg>Exercises</button>
 </div></nav>
-<div class="rest" id="rest" hidden aria-live="polite"><div><svg class="rring" viewBox="0 0 44 44" aria-hidden="true"><circle class="t" cx="22" cy="22" r="18"/><circle class="p" id="rbar" cx="22" cy="22" r="18" pathLength="100"/></svg><div class="rtx"><span class="tm" id="rtm">0:00</span><span class="lb" id="rlb"></span></div><button id="rminus" aria-label="15 seconds less">−15</button><button id="rplus" aria-label="15 seconds more">+15</button><button id="rskip" aria-label="Skip rest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div></div>
+<div class="restbar" id="rest" hidden aria-live="polite"><div><svg class="rring" viewBox="0 0 44 44" aria-hidden="true"><circle class="t" cx="22" cy="22" r="18"/><circle class="p" id="rbar" cx="22" cy="22" r="18" pathLength="100"/></svg><div class="rtx"><span class="tm" id="rtm">0:00</span><span class="lb" id="rlb"></span></div><button id="rminus" aria-label="15 seconds less">−15</button><button id="rplus" aria-label="15 seconds more">+15</button><button id="rskip" aria-label="Skip rest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div></div>
 
 <div class="sheet" id="player" hidden role="dialog" aria-modal="true" aria-labelledby="pname"><div class="wrap">
   <div class="shead"><button class="done" id="pclose">Done</button></div><h2 class="lt" id="pname"></h2>
@@ -1329,7 +1329,7 @@ const todayStr=()=>ymd(new Date());
 const WD=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],WDL=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],MO=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const fmtLong=s=>{const d=parse(s);return`${WDL[d.getDay()]}, ${MO[d.getMonth()]} ${d.getDate()}`};
 const fmtShort=s=>{const d=parse(s);return`${MO[d.getMonth()]} ${d.getDate()}`};
-const fmtRest=s=>s>=60?(s%60?`${Math.floor(s/60)}:${pad(s%60)}`:`${s/60} min`):`${s} s`;
+const fmtRest=s=>`${Math.floor(s/60)}:${pad(s%60)}`;
 
 /* ---------- program ---------- */
 const weekOf=s=>S.start?Math.floor(diffDays(mondayOf(S.start),s)/7)+1:0;
@@ -1353,21 +1353,21 @@ const WARM={lift:[["bwsquat","8 slow reps"],["hinge","8 reps"],["wgs","3 each si
 const COOL=[["hipflex","30 s each side"],["hamstretch","30 s each side"],["childpose","45 s"],["calfstretch","30 s each side"]];
 const WHY_WARM="Warming up improved performance in about 4 of 5 measures across studies (Fradkin 2010 meta-analysis). A warm-up before hard lowering work slightly reduced next-day soreness (Law & Herbert 2007). Structured movement warm-ups cut injuries by about a third in team sports (Thorborg 2017); that is sport, not lifting, so treat it as indirect. One or two light ramp-up sets on the first lift for each muscle group are enough (Iversen 2021). Skip long static stretches here; under 60 s per muscle does no harm (Behm 2016).";
 const WHY_COOL="Honest note: a cool-down does not prevent soreness or injury, or speed up recovery (Van Hooren & Peake 2018). Stretching afterwards cuts soreness by a trivial amount (Herbert 2011 Cochrane review). Do it because it feels good and brings your heart rate down gently; regular stretching does improve range of motion over weeks (Behm 2016). What really limits soreness is building up slowly, which your RIR 3 start already does.";
-const warmUp=acc=>({title:"Warm-up",prep:true,hint:"About 6 min. Ramp-up sets are marked on the first lift for each muscle group.",why:WHY_WARM,
-  items:[I("wu_bike",null,"Easy bike",{rx:"3 min · easy, 3–4/10 effort"}),I("wu_moves",null,"Warm-up moves",{rx:"About 3 min · 4 moves",sub:acc?WARM.acc:WARM.lift})]});
-const coolDown=bike=>({title:"Cool-down",prep:true,hint:"About 4 min, for comfort.",why:WHY_COOL,
-  items:[...(bike?[I("cd_bike",null,"Easy bike",{rx:"2–3 min · very easy"})]:[]),I("cd_moves",null,"Stretches",{rx:"About 3 min · 4 stretches",sub:COOL}),I("cd_breath",null,"Slow breathing",{rx:"1 min · in 4 s, out 6 s, through the nose"})]});
+const warmUp=acc=>({title:"Warm-up",prep:true,hint:"Ramp-up sets are marked on the first lift for each muscle group.",why:WHY_WARM,
+  items:[I("wu_bike",null,"Easy bike",{rx:"easy, 3–4/10 effort",est:3}),I("wu_moves",null,"Warm-up moves",{rx:"4 moves",sub:acc?WARM.acc:WARM.lift,est:3})]});
+const coolDown=bike=>({title:"Cool-down",prep:true,hint:"For comfort.",why:WHY_COOL,
+  items:[...(bike?[I("cd_bike",null,"Easy bike",{rx:"very easy",est:2})]:[]),I("cd_moves",null,"Stretches",{rx:"4 stretches",sub:COOL,est:3}),I("cd_breath",null,"Slow breathing",{rx:"in 4 s, out 6 s, through the nose",est:1})]});
 /* quality-of-life routines: [exercise id or null, step, dose, clip] */
 const ROUT=[
-  {k:"am",n:"Morning",ic:"sun",dur:"10 min",win:[0,180],why:"Morning light sets your body clock, so you get sleepy on time at night. A regular wake time is a core part of CBT-I, the standard non-drug insomnia treatment.",
+  {k:"am",n:"Morning",ic:"sun",mins:10,win:[0,180],why:"Morning light sets your body clock, so you get sleepy on time at night. A regular wake time is a core part of CBT-I, the standard non-drug insomnia treatment.",
     steps:[[null,"Daylight","10 min outside or at an open window within an hour of waking. Sitting with your coffee counts."],[null,"Same wake time","Every day, weekends included"]]},
-  {k:"desk",n:"Desk breaks",ic:"desk",dur:"2 min",why:"Breaking up sitting with short bodyweight moves (half-squats, calf raises) lowered blood sugar and insulin through the day (Dempsey 2016). Seated heel raises kept leg muscles burning sugar while sitting (Hamilton 2022).",
+  {k:"desk",n:"Desk breaks",ic:"desk",mins:2,why:"Breaking up sitting with short bodyweight moves (half-squats, calf raises) lowered blood sugar and insulin through the day (Dempsey 2016). Seated heel raises kept leg muscles burning sugar while sitting (Hamilton 2022).",
     steps:[["bwsquat","Bodyweight squats","10, standing up from your chair",1],["calf","Calf raises","15"],[null,"Can't stand up?","Seated heel raises for 2 min: balls of your feet down, lift your heels"]]},
-  {k:"lunch",n:"After lunch",ic:"bolt",dur:"3 min",win:[0,120],why:"Working your leg muscles soon after eating pulls sugar out of the blood. Resistance exercise after a meal lowers the rise (Heden 2015), and short squat and calf-raise bouts helped too (Dempsey 2016). Caffeine within about 9 h of bed cuts sleep (Gardiner 2023).",
+  {k:"lunch",n:"After lunch",ic:"bolt",mins:3,win:[0,120],why:"Working your leg muscles soon after eating pulls sugar out of the blood. Resistance exercise after a meal lowers the rise (Heden 2015), and short squat and calf-raise bouts helped too (Dempsey 2016). Caffeine within about 9 h of bed cuts sleep (Gardiner 2023).",
     steps:[["bwsquat","Bodyweight squats","2 × 10, within 30 min of eating"],["calf","Calf raises","2 × 15"],[null,"Last caffeine",()=>`By ${fmtM(toMin(S.rt.pm.t)-540)}, about 9 h before bed`]]},
-  {k:"dinner",n:"After dinner",ic:"bolt",dur:"3 min",win:[0,150],why:"Working your leg muscles soon after eating pulls sugar out of the blood. Resistance exercise after a meal lowers the rise (Heden 2015), and short squat and calf-raise bouts helped too (Dempsey 2016).",
+  {k:"dinner",n:"After dinner",ic:"bolt",mins:3,win:[0,150],why:"Working your leg muscles soon after eating pulls sugar out of the blood. Resistance exercise after a meal lowers the rise (Heden 2015), and short squat and calf-raise bouts helped too (Dempsey 2016).",
     steps:[["bwsquat","Bodyweight squats","2 × 10, within 30 min of eating"],["calf","Calf raises","2 × 15"],[null,"Watching TV?","Seated heel raises work too, 5 min or more"]]},
-  {k:"pm",n:"Wind-down",ic:"moon",dur:"30 min",off:-30,win:[0,90],why:"Bright evening light delays melatonin. Relaxation training is part of CBT-I and helps you fall asleep.",
+  {k:"pm",n:"Wind-down",ic:"moon",mins:30,off:-30,win:[0,90],why:"Bright evening light delays melatonin. Relaxation training is part of CBT-I and helps you fall asleep.",
     steps:[[null,"Dim the lights","Screens away, lamps low"],[null,"Slow breathing","5 min · in 4 s, out 6 s, through the nose"],[null,"Same bedtime","Lights out at your set time"]]}];
 const toMin=t=>{const[h,m]=String(t||"0:0").split(":").map(Number);return h*60+(m||0)};
 const fmtT=t=>t.replace(/^0/,"");
@@ -1376,9 +1376,19 @@ const stepRx=x=>typeof x==="function"?x():x;
 const rtTime=r=>r.k==="desk"?`${fmtT(S.rt.desk.from)}–${fmtT(S.rt.desk.to)}`:fmtM(toMin(S.rt[r.k].t)+(r.off||0));
 const deskTarget=()=>{const c=S.rt.desk;return Math.max(1,Math.floor((toMin(c.to)-toMin(c.from))/(+c.every||60)))};
 function routinesFor(dow){return ROUT.filter(r=>S.rt[r.k]&&S.rt[r.k].on&&(r.k!=="desk"||(dow>=1&&dow<=5)))
-  .map(r=>I("r_"+r.k,null,r.n,{rx:`${rtTime(r)} · ${r.dur}`,rt:r,count:r.k==="desk"?deskTarget():0}))}
+  .map(r=>{const n=r.k==="desk"?deskTarget():0;return I("r_"+r.k,null,r.n,{rx:r.k==="desk"?`every ${S.rt.desk.every||60} min, ${rtTime(r)}`:`at ${rtTime(r)}`,rt:r,count:n,est:n?n*r.mins:r.mins,est1:r.mins})})}
 const exById=id=>EX.find(e=>e.id===id);
 const exName=id=>(exById(id)||{}).name||id;
+/* time model, from the EasyBody plan (§6.6): a work set takes 1 min (0.5 for short power sets, twice that when done
+   each side), then the prescribed rest between sets (none after the last); each ramp-up set adds 1.5 min and each
+   exercise 0.5 min to set up. Timed items carry their own minutes in est. Estimates use the required sets. */
+function estMin(i){
+  if(i.locked)return 0;if(i.est!=null)return i.est;if(!i.sets)return 0;
+  const n=i.sets[0],w=(i.work??1)*(/each side/.test(i.reps)?2:1),rn=i.ramp?+((/^(\d) (light|easy)/.exec(i.ramp)||[0,1])[1]):0;
+  return n*w+(n-1)*(i.rest||0)/60+rn*1.5+.5}
+/* minutes already done: sets done out of the required sets, desk breaks done, or the whole item */
+function doneMin(i,R){const m=estMin(i);if(!m)return 0;if(i.sets)return m*Math.min(R.sets[i.key]||0,i.sets[0])/i.sets[0];if(i.count)return (i.est1||0)*Math.min(R.desk||0,i.count);return isDone(i,R)?m:0}
+const fmtMin=m=>`${Math.max(1,Math.round(m))} min`;
 /* item: sets [min,max] + reps → tap-per-set; otherwise a single Done tap */
 function I(key,ex,name,o){const it=Object.assign({key,ex,name:name||exName(ex),clip:0,w:false},o);
   if(it.sets&&!it.rx){const[a,b]=it.sets;it.rx=[`${a===b?a:a+"–"+b} × ${it.reps}`,it.rir,it.rest&&"rest "+fmtRest(it.rest),it.note,it.ramp&&`ramp: ${it.ramp} first`].filter(Boolean).join(" · ")}
@@ -1390,40 +1400,40 @@ function plan(d){
   if(["F","A","B","C"].includes(type)){
     const it=[];
     if(type==="B"){
-      it.push(I("cmj","cmj",null,S.jumps?{sets:[3,3],reps:"1 jump",rest:75,note:w<=14?"70–80% effort":"max effort"}:{rx:"Locked until you unlock jumps in Settings",locked:true}));
-      it.push(I("pogo","pogo",null,S.jumps?{sets:[2,2],reps:"10 hops",rest:60}:{rx:"Locked until you unlock jumps in Settings",locked:true}));
+      it.push(I("cmj","cmj",null,S.jumps?{sets:[3,3],reps:"1 jump",rest:75,work:.5,note:w<=14?"70–80% effort":"max effort"}:{rx:"Locked until you unlock jumps in Settings",locked:true}));
+      it.push(I("pogo","pogo",null,S.jumps?{sets:[2,2],reps:"10 hops",rest:60,work:.5}:{rx:"Locked until you unlock jumps in Settings",locked:true}));
     }
-    it.push(I("landmine","landmine",null,{sets:[3,3],reps:"5 each side",rest:60,note:type==="F"&&w<=2?"slow, learn the arc":"fast",w:true}));
+    it.push(I("landmine","landmine",null,{sets:[3,3],reps:"5 each side",rest:60,work:.5,note:type==="F"&&w<=2?"slow, learn the arc":"fast",w:true}));
     if(type==="F"){
       it.push(I("deadlift","deadlift",null,{sets:[2,3],reps:"6–8",rir:"RIR 3–4",rest:120,note:"high handles",ramp:"2 light sets",w:true}));
       it.push(I("pullup","pullup","Pulldown or assisted pull-up",{sets:[2,3],reps:"8–10",rir:"RIR 3",rest:90,ramp:"1 easy set",w:true}));
       it.push(I("pushup","pushup",null,{sets:[2,3],reps:"8–12",rir:"RIR 3",rest:90,ramp:"5 incline reps"}));
       it.push(I("press","press","Half-kneeling DB press",{sets:[2,3],reps:"8–10 each side",rir:"RIR 3",rest:75,clip:1,ramp:"1 light set",w:true}));
-      it.push(w<=2?I("swing","swing",w===1?"Kettlebell deadlift":"Kettlebell hike pass",{sets:[3,3],reps:w===1?"8":"5",rest:60,w:true})
-        :I("swing","swing",null,{rx:"5–8 rounds · 20–30 s on, 30–40 s off",w:true}));
+      it.push(w<=2?I("swing","swing",w===1?"Kettlebell deadlift":"Kettlebell hike pass",{sets:[3,3],reps:w===1?"8":"5",rest:60,work:.5,w:true})
+        :I("swing","swing",null,{rx:"5–8 rounds · 20–30 s on, 30–40 s off",est:4.7,w:true}));
     }else if(type==="A"){
       it.push(I("deadlift","deadlift",null,{sets:[3,4],reps:"4–6",rir:"RIR 2–3",rest:150,ramp:"2 light sets",w:true}));
       it.push(I("pullup","pullup",null,{sets:up,reps:"5–8",rir:"RIR 2–3",rest:90,ramp:"1 easy set",w:true}));
       it.push(I("pushup","pushup",null,{sets:up,reps:"6–10",rir:"RIR 2–3",rest:90,ramp:"5 incline reps"}));
       it.push(I("press","press","Standing DB press",{sets:up,reps:"6–8",rir:"RIR 2–3",rest:120,ramp:"1 light set",w:true}));
-      it.push(I("swing","swing",null,{rx:"10–12 rounds · 30 s on, 30 s off",w:true}));
+      it.push(I("swing","swing",null,{rx:"10–12 rounds · 30 s on, 30 s off",est:10.5,w:true}));
     }else if(type==="C"){
       it.push(I("deadlift","deadlift",null,{sets:[2,3],reps:"8–10",rir:"RIR 2",rest:120,ramp:"2 light sets",w:true}));
       it.push(I("pushup","pushup",null,{sets:up,reps:"10–20",rir:"RIR 1–2",rest:90,ramp:"5 incline reps"}));
       it.push(I("pullup","pullup",null,{sets:up,reps:"8–12",rir:"RIR 1–2",rest:90,ramp:"1 easy set",w:true}));
       it.push(I("press","press","Standing DB press",{sets:up,reps:"10–12",rir:"RIR 1–2",rest:90,ramp:"1 light set",w:true}));
     }else{
-      it.push(I("swing","swing","Heavy kettlebell swing",{sets:[6,8],reps:"5",rest:50,ramp:"1 light set",w:true}));
-      it.push(I("press","press","DB push press",{sets:[4,4],reps:"3–5",rir:"RIR 3+",rest:90,clip:2,ramp:"1 light set",w:true}));
-      it.push(I("pushup","pushup",S.jumps?"Plyo push-up":"Fast push-up",{sets:[3,3],reps:"3–5",rest:60,note:"explosive",clip:S.jumps?1:0}));
-      it.push(I("pullup","pullup","Fast pull-up",{sets:[3,3],reps:"3–5",rest:75,ramp:"1 easy set"}));
+      it.push(I("swing","swing","Heavy kettlebell swing",{sets:[6,8],reps:"5",rest:50,work:.5,ramp:"1 light set",w:true}));
+      it.push(I("press","press","DB push press",{sets:[4,4],reps:"3–5",rir:"RIR 3+",rest:90,work:.5,clip:2,ramp:"1 light set",w:true}));
+      it.push(I("pushup","pushup",S.jumps?"Plyo push-up":"Fast push-up",{sets:[3,3],reps:"3–5",rest:60,work:.5,note:"explosive",clip:S.jumps?1:0}));
+      it.push(I("pullup","pullup","Fast pull-up",{sets:[3,3],reps:"3–5",rest:75,work:.5,ramp:"1 easy set"}));
     }
     if(type!=="B"){
       it.push(I("chop","chop",null,{sets:early?[2,2]:[3,3],reps:"8–10 each side",rir:early?"RIR 3":"RIR 2–3",rest:60,clip:(w+dow)%2,w:true}));
-      it.push(I("neck","neck","4-way neck",early?{sets:[2,2],reps:"10 s each way",rest:30,note:"push against your hand, ~50%"}:{sets:[3,3],reps:"15–25 each way",rest:45}));
+      it.push(I("neck","neck","4-way neck",early?{sets:[2,2],reps:"10 s each way",rest:30,work:1,note:"push against your hand, ~50%"}:{sets:[3,3],reps:"15–25 each way",rest:45,work:2}));
     }
     sec.push(warmUp(false),{title:"Workout",items:it});
-    if(type!=="B"){const c=ph===1?"P1":ph===2?"P2":"P3";sec.push({title:"Cardio",items:[I("cardio",null,`${CMIN[c]} min after lifting`,{rx:CARDIO[c]+" · 5–6/10 effort",min:CMIN[c]})]})}
+    if(type!=="B"){const c=ph===1?"P1":ph===2?"P2":"P3";sec.push({title:"Cardio",items:[I("cardio",null,"Bike and stairs",{rx:CARDIO[c]+" · 5–6/10 effort",min:CMIN[c],est:CMIN[c]})]})}
     sec.push(coolDown(type==="B"));
   }else if(type==="ACC"){
     sec.push(warmUp(true),{title:"Workout",items:[
@@ -1433,21 +1443,23 @@ function plan(d){
       I("latraise","latraise",null,{sets:[n,n],reps:"12–20",rest:60,w:true}),
       I("calf","calf",null,{sets:[n,n],reps:"10–15",rest:60,note:early?"pause 2 s at the bottom":"every 2nd set bent-knee",w:true}),
       I("hangraise","hangraise",early?"Hanging knee raise":null,{sets:[n,n],reps:"8–12",rest:60,clip:w>=9?1:0}),
-      I("sideplank","sideplank",null,{sets:[n,n],reps:"20–40 s each side",rest:30,note:"5–10 leg raises"}),
-      I("copenhagen","copenhagen",null,{sets:[n,n],reps:"15–30 s each side",rest:30,note:w>=9?"long lever if 30 s is easy":"knee on bench"})]});
-    const c=ph===1?"C1":ph===2?"I8":"I10";sec.push({title:"Cardio",items:[I("cardio",null,`${CMIN[c]} min after strength`,{rx:CARDIO[c],min:CMIN[c]})]},coolDown(false));
+      I("sideplank","sideplank",null,{sets:[n,n],reps:"20–40 s each side",rest:30,work:.6,note:"5–10 leg raises"}),
+      I("copenhagen","copenhagen",null,{sets:[n,n],reps:"15–30 s each side",rest:30,work:.5,note:w>=9?"long lever if 30 s is easy":"knee on bench"})]});
+    const c=ph===1?"C1":ph===2?"I8":"I10";sec.push({title:"Cardio",items:[I("cardio",null,"Bike and stairs",{rx:CARDIO[c],min:CMIN[c],est:CMIN[c]})]},coolDown(false));
   }else if(type==="SAT"&&ph>=2){
-    sec.push({title:"Optional",items:[I("cardio",null,"15 min easy cardio",{rx:CARDIO.S15,opt:true})]});
+    sec.push({title:"Optional",items:[I("cardio",null,"Easy cardio",{rx:CARDIO.S15,opt:true,est:15})]});
   }
   sec.push({title:"Every day",daily:true,items:[
-    I("face","face","Face routine",{rx:"10 min · 4 moves"}),
-    I("flow",null,"Mobility flow",{rx:"8–10 min · 8 moves",sub:FLOW}),
-    I("chin","neck","Chin tuck",{rx:"2 × 10 · 5 s hold"}),
-    I("pelvic","pelvic","Pelvic floor",{rx:"3 × 10 · 5 s hold",opt:true})]});
+    I("face","face","Face routine",{rx:"4 moves",est:10}),
+    I("flow",null,"Mobility flow",{rx:"8 moves",sub:FLOW,est:9}),
+    I("chin","neck","Chin tuck",{rx:"2 × 10 · 5 s hold",est:2}),
+    I("pelvic","pelvic","Pelvic floor",{rx:"3 × 10 · 5 s hold",opt:true,est:5})]});
   const rs=routinesFor(dow);if(rs.length)sec.push({title:"Routines",daily:true,routines:true,hint:"Small habits through the day. They count toward your Daily ring.",items:rs});
   return{type,week:w,phase:ph,deload:w===12||w===18,sections:sec};
 }
 const allItems=P=>P.sections.flatMap(s=>s.items);
+/* planned and done minutes for a day; routines (daylight, wind-down) are habits, not training, so they stay out */
+const dayMin=(P,R)=>{let t=0,d=0;P.sections.filter(s=>!s.routines).forEach(s=>s.items.forEach(i=>{if(i.opt&&!isDone(i,R))return;t+=estMin(i);d+=doneMin(i,R)}));return{t,d}};
 const isDone=(i,R)=>i.sets?(R.sets[i.key]||0)>=i.sets[0]:i.count?(R.desk||0)>=i.count:!!R.done[i.key];
 const workItems=P=>P.sections.filter(s=>!s.daily&&!s.prep).flatMap(s=>s.items).filter(i=>!i.opt&&!i.locked);
 /* day status: training days count the workout + cardio; weekends never break a streak */
@@ -1505,6 +1517,7 @@ const IC={check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
   left:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>',
   flame:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c.6 3.3-1.3 5.2-2.8 7C7.6 11 6.5 12.6 6.5 15a5.5 5.5 0 0 0 11 0c0-2.3-1-4-2.3-5.6-.2 1.5-.9 2.6-2 3.1.4-3.7-.3-7.4-1.2-10.5z"/></svg>',
   rings:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="9.5"/><circle cx="12" cy="12" r="5.5"/></svg>',
+  clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
   cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>',
   up:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>',
   down:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>',
@@ -1523,7 +1536,7 @@ function rowHTML(i,R,d){
   const dn=isDone(i,R),how=i.ex?`<button class="hbtn" data-act="how" data-ex="${i.ex}" data-clip="${i.clip}" data-rx="${esc(i.rx)}" aria-label="How to do ${esc(i.name)}">${IC.play}</button>`:"";
   const L=i.w?lastW(i.key,d):null,wv=R.w[i.key];
   const wb=i.w&&!i.locked?`<button class="wbtn${wv?"":" ghost"}" data-act="w" aria-label="Weight for ${esc(i.name)}">${wv?esc(wv)+" kg":L?esc(L.v)+" kg":"+ kg"}</button>`:"";
-  let h=`<div class="ex${dn?" done":""}${i.locked?" locked":""}" data-key="${i.key}"><div class="exh"><div class="t"><b>${esc(i.name)}${i.opt?'<span class="tag">optional</span>':""}</b><span>${esc(i.rx)}</span></div>${wb}${how}</div>`;
+  let h=`<div class="ex${dn?" done":""}${i.locked?" locked":""}" data-key="${i.key}"><div class="exh"><div class="t"><b>${esc(i.name)}${i.opt?'<span class="tag">optional</span>':""}</b><span>${timeTxt(i)}${esc(i.rx)}</span></div>${wb}${how}</div>`;
   if(editW===i.key)h+=`<div class="wedit"><button data-act="wm" aria-label="Less weight">−</button><input id="winput" inputmode="decimal" value="${esc(wv||(L&&L.v)||"")}" aria-label="Weight in kg"><button data-act="wp" aria-label="More weight">+</button><span>kg</span></div>`;
   if(!i.locked){
     if(i.sets){const k=R.sets[i.key]||0;h+=`<div class="sets">`;for(let s=1;s<=i.sets[1];s++)h+=`<button class="set${s<=k?" on":""}${s>i.sets[0]?" opt":""}" data-act="set" data-n="${s}" aria-label="Set ${s}${s<=k?" done":""}">${s<=k?IC.check.replace("<svg",'<svg width="18" height="18"'):s}</button>`;
@@ -1533,6 +1546,7 @@ function rowHTML(i,R,d){
   if(i.sub&&openSub[i.key])h+=`<div class="sub">${i.sub.map(([id,rx,clip])=>`<div class="subrow"><div><b>${esc(exName(id))}</b><span>${esc(rx)}</span></div><button class="hbtn" data-act="how" data-ex="${id}" data-clip="${clip||0}" data-rx="${esc(rx)}" aria-label="How to do ${esc(exName(id))}">${IC.play}</button></div>`).join("")}</div>`;
   return h+`</div>`;
 }
+const timeTxt=i=>{const m=i.count?i.est1:estMin(i);return m?`≈ ${fmtMin(m)}${i.count?" each":""} · `:""};
 let openRt=null;
 /* the routine due right now (today only): inside its time window and not done; desk = interval since last break has passed */
 function dueRoutine(P,R){
@@ -1542,7 +1556,7 @@ function dueRoutine(P,R){
     const t=toMin(S.rt[r.k].t)+(r.off||0);return now>=t+r.win[0]&&now<t+r.win[1]})||null}
 function routineRow(i,R,d,due){
   const r=i.rt,dn=isDone(i,R),open=openRt===i.key||(openRt===null&&due===i);
-  let h=`<div class="ex${dn?" done":""}" data-key="${i.key}" id="row-${i.key}"><div class="exh"><span class="rti">${IC[r.ic]}</span><button class="t" data-act="rtx" style="text-align:left"><b>${esc(i.name)}${due===i?'<span class="tag now">Now</span>':""}</b><span>${esc(i.rx)}</span></button><span class="chev" style="transform:rotate(${open?90:0}deg)">${IC.right}</span></div>`;
+  let h=`<div class="ex${dn?" done":""}" data-key="${i.key}" id="row-${i.key}"><div class="exh"><span class="rti">${IC[r.ic]}</span><button class="t" data-act="rtx" style="text-align:left"><b>${esc(i.name)}${due===i?'<span class="tag now">Now</span>':""}</b><span>${timeTxt(i)}${esc(i.rx)}</span></button><span class="chev" style="transform:rotate(${open?90:0}deg)">${IC.right}</span></div>`;
   if(r.k==="desk"){const k=R.desk||0;
     h+=`<div class="pips">${Array.from({length:i.count},(_,j)=>`<i class="${j<k?"on":""}"></i>`).join("")}</div><div class="deskc"><button class="donebtn" data-act="desk">${IC.plus}Log break</button>${k?`<button class="rminus" data-act="deskm" aria-label="Remove a break">−</button>`:""}<span class="lastv">${k}/${i.count} breaks${R.deskT&&d===todayStr()?`<br>last ${new Date(R.deskT).toTimeString().slice(0,5)}`:""}</span></div>`}
   else h+=`<div class="sets"><button class="donebtn" data-act="toggle">${IC.check}${dn?"Done":"Mark done"}</button></div>`;
@@ -1563,11 +1577,12 @@ function renderToday(){
   if(due)h+=`<div class="card nowc" style="--rc:var(--r3)" data-key="${due.key}"><span class="rti">${IC[due.rt.icon||due.rt.ic]}</span><button class="t" data-act="rtgo"><small>NOW</small><b>${esc(due.name)}</b><span>${esc(due.rt.steps.map(x=>x[1]).join(" · "))}</span></button><button class="pill" data-act="${due.rt.k==="desk"?"desk":"toggle"}">${due.rt.k==="desk"?"Log":"Done"}</button></div>`;
   const stat=(n,c,x,u)=>`<div><dt>${n}</dt><dd style="color:var(${c})">${x?`${x.a}/${x.b}<small>${u}</small>`:`<span class="rest">Rest</span>`}</dd></div>`;
   h+=`<div class="card"><div class="act">${ringSVG([frac(M.w),frac(M.c),frac(M.d)],anim)}<dl>${stat("Workout","--r1",M.w,"SETS")}${stat("Cardio","--r2",M.c,"MIN")}${stat("Daily","--r3",M.d,"MOVES")}</dl></div>
-    <div class="actf"><span>Week <b>${P.week}</b> · ${PHASE[P.phase]}</span>${req.length?(full?`<span class="ok">Workout complete</span>`:`<span>${dn} of ${req.length} done</span>`):`<span>Recovery day</span>`}</div></div>`;
+    <div class="actf"><span>Week <b>${P.week}</b> · ${PHASE[P.phase]}</span>${full?`<span class="ok">Workout complete · ${fmtMin(dayMin(P,R).d)}</span>`:(()=>{const T=dayMin(P,R);return`<span>${Math.round(T.d)} of ${fmtMin(T.t)} done</span>`})()}</div></div>`;
   if(P.deload)h+=`<div class="note"><span><b>Deload week.</b> Do about half the sets at the same weights.</span></div>`;
   P.sections.forEach(s=>{
     const c=s.items.filter(i=>!i.locked&&isDone(i,R)).length,tot=s.items.filter(i=>!i.locked&&!i.opt).length;
-    h+=`<div class="sec"><h3>${esc(s.title)}</h3><span>${Math.min(c,tot)}/${tot}</span></div>`;
+    const sm=s.items.filter(i=>!i.opt).reduce((a,i)=>a+estMin(i),0);
+    h+=`<div class="sec"><h3>${esc(s.title)}</h3><span>${sm?`≈ ${fmtMin(sm)} · `:""}${Math.min(c,tot)}/${tot}</span></div>`;
     if(s.hint)h+=`<p class="hint">${esc(s.hint)}${s.why?` <button class="linkbtn" data-act="why" data-sec="${esc(s.title)}">${openWhy[s.title]?"Hide":"Why?"}</button>`:""}</p>`;
     if(s.why&&openWhy[s.title])h+=`<p class="why secwhy"><b>Research</b>${esc(s.why)}</p>`;
     h+=`<div class="card" style="--rc:var(${s.daily?"--r3":s.title==="Workout"||s.prep?"--r1":"--r2"})">${s.items.map(i=>s.routines?routineRow(i,R,d,due):rowHTML(i,R,d)).join("")}</div>`;
@@ -1665,6 +1680,9 @@ function renderProgress(){
   const m=mondayOf(t);let bars="",dn=0,sets=0;
   for(let i=0;i<7;i++){const x=addDays(m,i),M=metrics(x),f=frac(M.w);if(i<5&&status(x)==="done")dn++;if(M.w)sets+=M.w.a;
     bars+=`<div class="${x===t?"t":""}"><span class="bw"><i class="${f?"":"z"}" style="height:${f?Math.max(8,f*100).toFixed(0):8}%"></i></span><span>${WD[parse(x).getDay()][0]}</span></div>`}
+  {let tb="",pt=0,dt=0,mx=1;const ms=[];for(let i=0;i<7;i++){const x=addDays(m,i),T=dayMin(plan(x),getRec(x));ms.push(T);mx=Math.max(mx,T.t)}
+   ms.forEach((T,i)=>{const x=addDays(m,i);pt+=T.t;dt+=T.d;tb+=`<div class="${x===t?"t":""}"><span class="bw"><i class="${T.d?"":"z"}" style="height:${T.d?Math.max(8,T.d/mx*100).toFixed(0):8}%${T.d?";background:var(--r2)":""}"></i></span><span>${WD[parse(x).getDay()][0]}</span></div>`});
+   h+=hc("--r2",IC.clock,"Time","This week",`${Math.round(dt)}<small>of ${Math.round(pt)} min</small>`,"Estimated from sets, rests and timed moves",`<div class="bars">${tb}</div>`)}
   h+=hc("--r1",IC.rings,"Workouts","This week",`${dn}<small>of 5 sessions</small>`,`${sets} set${sets===1?"":"s"} logged this week`,`<div class="bars">${bars}</div>`);
   const pf=w?Math.min(1,(w-1+((parse(t).getDay()+6)%7+1)/7)/24):0,PH=[[1,4,"Foundation"],[5,12,"Build"],[13,24,"Power"]];
   h+=`<div class="hc" style="--hc:var(--indigo)"><div class="hch">${IC.cal}Program<span>${w?(w>24?"Maintenance":PHASE[phaseOf(w)]):"Not started"}</span></div>
