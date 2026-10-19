@@ -31,6 +31,12 @@
 [hidden]{display:none!important}
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--fb);font-size:15px;line-height:1.35;-webkit-font-smoothing:antialiased}
 body{overscroll-behavior-y:none}
+/* every tab keeps the same frame: the scrollbar space never comes and goes (no sideways jump on desktop), and each tab is at least
+   as tall as the large viewport, so iOS Safari treats Today like the other tabs instead of re-expanding its toolbars */
+html{scrollbar-gutter:stable}
+#app{box-sizing:border-box;min-height:100vh;min-height:100lvh}
+/* tall phones: give the rings and section rows the extra room instead of leaving a gap */
+@media (min-height:880px){.act .rg{width:118px;height:118px}.act{padding:16px 18px 14px}.act dl{gap:10px}.tile{min-height:52px}.upnext{margin:14px 0}}
 button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0}
 input,textarea{font:inherit;color:var(--ink)}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -1766,7 +1772,7 @@ $("tab-library").addEventListener("click",e=>{const f=e.target.closest("[data-f]
 /* ---------- tabs ---------- */
 let tab="today";
 function setTab(t){tab=t;["today","progress","library"].forEach(k=>$("tab-"+k).hidden=k!==t);document.querySelectorAll(".tabbar [data-tab]").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t));
-  if(t==="today"){ringAnim=true;renderToday()}else if(t==="progress")renderProgress();else if(!$("tab-library").childElementCount)renderLibrary();
+  if(t==="today")renderToday();else if(t==="progress")renderProgress();else if(!$("tab-library").childElementCount)renderLibrary();
   if(t!=="today")$("htitle").textContent=t==="progress"?"Progress":"Exercises",$("hdate").textContent=t==="progress"?"Highlights":"Tap any exercise to watch it";scrollTo(0,0)}
 document.querySelector(".tabbar").addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(!b)return;if(!$("secview").hidden)closeSheets(false);setTab(b.dataset.tab)});
 

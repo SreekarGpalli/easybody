@@ -10,7 +10,9 @@ import { readFileSync } from "node:fs";
 import vm from "node:vm";
 
 const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
-const js = html.slice(html.indexOf("<script>") + 8, html.indexOf("/* ================= APP"));
+const full = html.slice(html.indexOf("<script>") + 8, html.lastIndexOf("</script>"));
+new vm.Script(full, { filename: "index.html <script>" }); // whole app script must parse
+const js = full.slice(0, full.indexOf("/* ================= APP"));
 const ctx = { console, Math, JSON, Object, Array, Set, Number, String, Error };
 vm.createContext(ctx);
 vm.runInContext(js + ";Object.assign(this,{EX,Stage,compute,FY,L,limbSign,solePts,sub,len});", ctx);
